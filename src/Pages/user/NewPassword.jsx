@@ -28,7 +28,7 @@ const NewPassword = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8">
             {/* New Password Form */}
-            <div className="w-full lg:w-1/2 max-w-md order-2 lg:order-1">
+            <div className="w-full lg:w-1/2 max-w-md order-1 lg:order-1">
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 sm:p-8">
                 {/* Title */}
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 text-left">
@@ -167,7 +167,7 @@ const NewPassword = () => {
             </div>
 
             {/* Image Section */}
-            <div className="w-full lg:w-1/2 flex justify-center order-1 lg:order-2">
+            <div className="w-full lg:w-1/2 flex justify-center order-2 lg:order-2">
               <img
                 src={fashionPreview}
                 alt="Ecommerce preview"

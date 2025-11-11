@@ -3,6 +3,7 @@ import ForgotPassEmail from "./Pages/user/ForgotPassEmail";
 import Login from "./Pages/user/Login";
 import OTPVerification from "./Pages/user/OTPVerification";
 import NewPassword from "./Pages/user/NewPassword";
+import Signup from "./Pages/user/Signup";
 
 
 function App() {
@@ -10,8 +11,9 @@ function App() {
     <>
       {/* <ForgotPassEmail /> */}
       {/* <Login /> */}
-      {/* <OTPVerification /> */}
+      <OTPVerification />
       {/* <NewPassword /> */}
+      {/* <Signup /> */}
     </>
   );
 }
