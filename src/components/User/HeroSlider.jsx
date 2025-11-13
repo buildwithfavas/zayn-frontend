@@ -49,7 +49,7 @@ const HeroSlider = ({
   };
 
   return (
-    <div className="relative w-full h-[280px] md:h-[350px] bg-gray-900 overflow-hidden rounded-2xl">
+    <div className="relative w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px] bg-gray-900 overflow-hidden rounded-xl md:rounded-2xl">
       {/* Slides */}
       {slides.map((slide, index) => (
         <div
@@ -73,20 +73,20 @@ const HeroSlider = ({
 
           {/* Content */}
           <div className="relative z-10 h-full flex items-center">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
-              <div className="max-w-xl ml-16 md:ml-20">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-2">
+            <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 w-full">
+              <div className="max-w-xs sm:max-w-sm md:max-w-xl ml-4 sm:ml-8 md:ml-16 lg:ml-20">
+                <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-1 sm:mb-2">
                   {slide.heading || slide.title}
                 </h2>
-                <h3 className="text-2xl md:text-4xl font-bold text-white mb-3">
+                <h3 className="text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3">
                   {slide.subheading || slide.subtitle}
                 </h3>
-                <p className="text-base md:text-lg text-gray-200 mb-4">
+                <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-none">
                   {slide.description}
                 </p>
                 <a
                   href={slide.ctaLink || slide.buttonLink}
-                  className="inline-block bg-white text-gray-900 px-6 py-2.5 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+                  className="inline-block bg-white text-gray-900 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-semibold hover:bg-gray-100 transition-colors text-sm sm:text-base"
                 >
                   {slide.ctaText || slide.buttonText}
                 </a>
@@ -99,20 +99,20 @@ const HeroSlider = ({
       {/* Navigation Arrows */}
       <button
         onClick={goToPrevious}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-2 sm:p-3 rounded-full shadow-lg transition-all"
         aria-label="Previous slide"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
       <button
         onClick={goToNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-2 sm:p-3 rounded-full shadow-lg transition-all"
         aria-label="Next slide"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>

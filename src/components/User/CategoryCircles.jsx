@@ -28,10 +28,10 @@ const CategoryCircles = ({ items = categories }) => {
   };
 
   return (
-    <div className="pt-8 pb-4 relative">
+    <div className="pt-8 pb-4 relative w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
         {/* Navigation Arrows - Top Right */}
-        <div className="absolute right-4 sm:right-6 -top-10 flex gap-2 z-10">
+        <div className="absolute right-4 sm:right-6 -top-8 flex gap-2 z-10">
           {/* Left Arrow */}
           <button
             onClick={() => scroll('left')}

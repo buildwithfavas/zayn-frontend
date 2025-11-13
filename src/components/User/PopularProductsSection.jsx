@@ -45,11 +45,11 @@ const PopularProductsSection = ({ title, subtitle, categoriesData }) => {
       {/* Header Section with Category Slider on Same Line */}
       <div className="mb-6">
         {/* Title and Category Tabs Row */}
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-2">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
           
-          {/* Category Slider on Right Side */}
-          <div className="flex-shrink-0 max-w-md">
+          {/* Category Slider on Right Side (Next Line on Mobile) */}
+          <div className="flex-shrink-0 w-full sm:w-auto sm:max-w-md">
             <CategorySlider
               categories={categories}
               activeCategory={activeCategory}

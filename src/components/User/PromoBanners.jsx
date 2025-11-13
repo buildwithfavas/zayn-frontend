@@ -22,7 +22,7 @@ import React from "react";
 const PromoBanners = ({ banners, onButtonClick }) => {
   return (
     <div className="py-2">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {banners.map((banner) => (
           <div
             key={banner.id}

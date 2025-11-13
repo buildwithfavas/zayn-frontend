@@ -26,10 +26,10 @@ const ProductCarousel = ({ title, products, showViewAll = true }) => {
   };
 
   return (
-    <div className="py-2">
+    <div className="py-2 w-full">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
         {showViewAll && (
           <a
             href="#"
@@ -44,12 +44,12 @@ const ProductCarousel = ({ title, products, showViewAll = true }) => {
       </div>
 
       {/* Carousel Container */}
-      <div className="relative group/carousel">
+      <div className="relative group/carousel px-6">
         {/* Left Arrow */}
         {showLeftArrow && (
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg p-3 rounded-full hover:bg-gray-50 transition-all opacity-0 group-hover/carousel:opacity-100 -translate-x-1/2"
+            className="absolute -left-3 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg p-3 rounded-full hover:bg-gray-50 transition-all opacity-0 group-hover/carousel:opacity-100"
             aria-label="Scroll left"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,11 +62,11 @@ const ProductCarousel = ({ title, products, showViewAll = true }) => {
         <div
           ref={scrollContainerRef}
           onScroll={checkScroll}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
+          className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {products.map((product) => (
-            <div key={product.id} className="flex-shrink-0 w-64">
+            <div key={product.id} className="flex-shrink-0 w-48 sm:w-56 md:w-64">
               <ProductCard product={product} />
             </div>
           ))}
@@ -76,7 +76,7 @@ const ProductCarousel = ({ title, products, showViewAll = true }) => {
         {showRightArrow && (
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg p-3 rounded-full hover:bg-gray-50 transition-all opacity-0 group-hover/carousel:opacity-100 translate-x-1/2"
+            className="absolute -right-3 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg p-3 rounded-full hover:bg-gray-50 transition-all opacity-0 group-hover/carousel:opacity-100"
             aria-label="Scroll right"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -95,7 +95,7 @@ const ProductCard = ({ product }) => {
       </div>
 
       {/* Product Info */}
-      <div className="p-4 flex flex-col flex-grow">
+      <div className="p-3 sm:p-4 flex flex-col flex-grow">
         {/* Brand */}
         {brand && (
           <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
