@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import UserLayout from "../../components/User/UserLayout";
+import { useState } from "react";
 import fashionPreview from "../../assets/fashion-preview.jpg";
+import UserLayout from "../../components/user/UserLayout";
 
 const NewPassword = () => {
   const [newPassword, setNewPassword] = useState("");

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import UserLayout from "../../components/User/UserLayout";
 import fashionPreview from "../../assets/fashion-preview.jpg";
+import UserLayout from "../../components/user/UserLayout";
 
 const Login = () => {
   const [email, setEmail] = useState("");

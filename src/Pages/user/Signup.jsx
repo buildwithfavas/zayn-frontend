@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import UserLayout from "../../components/User/UserLayout";
 import fashionPreview1 from "../../assets/fashion-preview1.jpg";
+import UserLayout from "../../components/user/UserLayout";
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");

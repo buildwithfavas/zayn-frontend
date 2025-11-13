@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import UserLayout from "../../components/User/UserLayout";
+import { useEffect, useRef, useState } from "react";
+import UserLayout from "../../components/user/UserLayout";
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
