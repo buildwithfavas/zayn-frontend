@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import shareIcon from "../../assets/share icon.png";
 
 /**
  * ProductCard Component
@@ -50,7 +51,7 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100">
+    <div className="bg-white rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col box-border border border-gray-100">
       {/* Image Container */}
       <div className="relative bg-gray-50 aspect-square overflow-hidden">
         {/* Discount Badge */}
@@ -84,12 +85,43 @@ const ProductCard = ({ product }) => {
           </svg>
         </button>
 
+        {/* Share Button - Shows on Hover (slightly below wishlist) */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            const url = `${window.location.origin}/products/${product.id}`;
+            const shareData = {
+              title: displayTitle,
+              text: `${displayTitle}${price ? ` — ₹${price.toLocaleString('en-IN')}` : ''}`,
+              url,
+            };
+            if (navigator.share) {
+              navigator.share(shareData).catch(() => {
+                // fallback if user cancels
+              });
+            } else if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(url).then(() => {
+                // simple fallback feedback
+                alert('Product link copied to clipboard');
+              }).catch(() => {
+                window.prompt('Copy this link:', url);
+              });
+            } else {
+              window.prompt('Copy this link:', url);
+            }
+          }}
+          className="absolute top-14 right-3 bg-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 hover:scale-110 hover:bg-blue-50 group/share"
+          aria-label="Share product"
+        >
+          <img src={shareIcon} alt="Share" className="w-5 h-5" />
+        </button>
+
         {/* Product Image */}
         <Link to={`/products/${product.id}`}>
           <img
             src={image}
             alt={displayTitle}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+            className="w-full h-full object-cover sm:group-hover:scale-105 transition-transform duration-300 cursor-pointer"
             onError={(e) => {
               e.target.src = "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=400&fit=crop";
             }}

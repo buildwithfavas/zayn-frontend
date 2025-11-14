@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProductCard from '../../components/user/ProductCard';
 import { allProducts as products } from '../../data/dummyProducts';
 
@@ -62,6 +62,26 @@ const ProductListing = () => {
   };
 
   const visiblePages = getVisiblePages();
+
+  // Clamp currentPage within valid bounds when total pages change (e.g., after filters)
+  useEffect(() => {
+    if (totalPages === 0 && currentPage !== 1) {
+      setCurrentPage(1);
+      return;
+    }
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    } else if (currentPage < 1) {
+      setCurrentPage(1);
+    }
+  }, [totalPages]);
+
+  // Scroll to top on page change ONLY for tablet/desktop; keep position on mobile
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(min-width: 640px)').matches) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentPage]);
 
   const sizes = ["38", "39", "40", "41", "42", "43", "44", "45", "46", "47"];
   const colors = [
@@ -393,7 +413,7 @@ const ProductListing = () => {
     <>
     <div className="min-h-screen" style={{backgroundColor: '#e7e7e3'}}>
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 py-6">
         {/* Mobile Filters/Sort Bar */}
         <div className="sm:hidden flex items-center justify-between mb-3">
           <button
@@ -450,8 +470,8 @@ const ProductListing = () => {
           {/* Right Content - Products */}
           <div className="flex-1">
 
-            {/* Products Grid: 2 cols on mobile, 4 cols from lg and up */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Products Grid: 2 on mobile, 3 on tablet, 4 on desktop */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 mb-8">
               {products && products.length > 0 ? (
                 products.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage).map((product) => (
                   <ProductCard key={product.id} product={product} />
@@ -463,8 +483,89 @@ const ProductListing = () => {
               )}
             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-center space-x-2">
+            {/* Pagination (Mobile) — six buttons with dynamic middle: <, 1, [slotA], …, [slotB], last, > */}
+            <div className="sm:hidden flex items-center justify-center gap-2 mt-2">
+              {/* Prev */}
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="w-8 h-8 text-xs rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
+                aria-label="Previous page"
+              >&lt;</button>
+
+              {/* 1 */}
+              <button
+                onClick={() => setCurrentPage(1)}
+                className={`w-8 h-8 text-xs rounded-lg border ${currentPage === 1 ? 'bg-black text-white' : ''}`}
+                style={currentPage === 1
+                  ? { backgroundColor: '#232321', color: 'white', borderColor: '#232321' }
+                  : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
+              >1</button>
+
+              {/* slotA: show 2 normally, or currentPage when in the middle */}
+              {totalPages >= 2 && (() => {
+                const last = totalPages;
+                const slotA = (currentPage > 2 && currentPage < last - 1) ? currentPage : 2;
+                if (slotA === 1 || slotA === last) return null;
+                return (
+                  <button
+                    onClick={() => setCurrentPage(slotA)}
+                    className={`w-8 h-8 text-xs rounded-lg border ${currentPage === slotA ? 'bg-black text-white' : ''}`}
+                    style={currentPage === slotA
+                      ? { backgroundColor: '#232321', color: 'white', borderColor: '#232321' }
+                      : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
+                  >{slotA}</button>
+                );
+              })()}
+
+              {/* Ellipsis (show when there is a gap between left cluster and right cluster) */}
+              {(() => {
+                const last = totalPages;
+                const slotA = (currentPage > 2 && currentPage < last - 1) ? currentPage : 2;
+                return last > 4 && (last - slotA > 2);
+              })() && (
+                <span className="px-1 text-gray-400 text-xs">…</span>
+              )}
+
+              {/* slotB: normally last-1, unless current is last-1 (then highlight) */}
+              {(() => {
+                const last = totalPages;
+                const slotB = last - 1;
+                if (slotB <= 1) return null;
+                return (
+                  <button
+                    onClick={() => setCurrentPage(slotB)}
+                    className={`w-8 h-8 text-xs rounded-lg border ${currentPage === slotB ? 'bg-black text-white' : ''}`}
+                    style={currentPage === slotB
+                      ? { backgroundColor: '#232321', color: 'white', borderColor: '#232321' }
+                      : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
+                  >{slotB}</button>
+                );
+              })()}
+
+              {/* last (only if > 1) */}
+              {totalPages > 1 && (
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  className={`w-8 h-8 text-xs rounded-lg border ${currentPage === totalPages ? 'bg-black text-white' : ''}`}
+                  style={currentPage === totalPages
+                    ? { backgroundColor: '#232321', color: 'white', borderColor: '#232321' }
+                    : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
+                >{totalPages}</button>
+              )}
+
+              {/* Next */}
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="w-8 h-8 text-xs rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
+                aria-label="Next page"
+              >&gt;</button>
+            </div>
+
+            <div className="hidden sm:flex items-center justify-center space-x-2">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
@@ -473,25 +574,18 @@ const ProductListing = () => {
               >
                 &lt; PREVIOUS
               </button>
-              
               {visiblePages.map(page => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-10 h-10 text-sm font-medium rounded-lg border transition-colors ${
-                    currentPage === page
-                      ? 'bg-black text-white'
-                      : 'hover:opacity-80'
-                  }`}
-                  style={currentPage === page 
+                  className={`w-10 h-10 text-sm font-medium rounded-lg border transition-colors ${currentPage === page ? 'bg-black text-white' : 'hover:opacity-80'}`}
+                  style={currentPage === page
                     ? { backgroundColor: '#232321', color: 'white', borderColor: '#232321' }
-                    : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }
-                  }
+                    : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
                 >
                   {page}
                 </button>
               ))}
-              
               {visiblePages[visiblePages.length - 1] < totalPages && (
                 <>
                   <span className="px-2 text-gray-400 text-sm">...</span>
@@ -504,7 +598,6 @@ const ProductListing = () => {
                   </button>
                 </>
               )}
-              
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
