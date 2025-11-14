@@ -2,6 +2,7 @@ import React from "react";
 import AnnouncementBar from "./AnnouncementBar";
 import Header from "./Header";
 import Navigation from "./Navigation";
+import Breadcrumb from "./Breadcrumb";
 import ServicesSection from "./ServicesSection";
 import Footer from "./Footer";
 
@@ -11,6 +12,7 @@ const UserLayout = ({ children }) => {
       <AnnouncementBar />
       <Header />
       <Navigation />
+      <Breadcrumb />
       <main className="flex-1">{children}</main>
       <ServicesSection />
       <Footer />

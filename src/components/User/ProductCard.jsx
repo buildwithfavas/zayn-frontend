@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 /**
  * ProductCard Component
@@ -84,14 +85,16 @@ const ProductCard = ({ product }) => {
         </button>
 
         {/* Product Image */}
-        <img
-          src={image}
-          alt={displayTitle}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={(e) => {
-            e.target.src = "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=400&fit=crop";
-          }}
-        />
+        <Link to={`/products/${product.id}`}>
+          <img
+            src={image}
+            alt={displayTitle}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+            onError={(e) => {
+              e.target.src = "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=400&fit=crop";
+            }}
+          />
+        </Link>
       </div>
 
       {/* Product Info */}
@@ -104,9 +107,13 @@ const ProductCard = ({ product }) => {
         )}
 
         {/* Product Title */}
-        <h3 className="text-base font-semibold text-gray-900 mb-1.5 line-clamp-2 min-h-[48px]">
-          {displayTitle}
-        </h3>
+        <Link to={`/products/${product.id}`}>
+          <div className="h-12 mb-1.5 flex items-start">
+            <h3 className="text-base font-semibold text-gray-900 line-clamp-2 leading-6 hover:text-blue-600 transition-colors cursor-pointer">
+              {displayTitle}
+            </h3>
+          </div>
+        </Link>
 
         {/* Rating */}
         <div className="flex items-center gap-1 mb-3">{renderStars()}</div>
@@ -124,9 +131,9 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Add to Cart Button */}
-        <button className="w-full bg-gray-900 text-white py-3 px-4 rounded-lg hover:bg-gray-800 transition-all text-sm font-semibold mt-auto flex items-center justify-center gap-2 group/button">
+        <button className="w-full bg-gray-900 text-white py-2 px-3 sm:py-3 sm:px-4 rounded-lg hover:bg-gray-800 transition-all text-[11px] sm:text-sm font-semibold mt-auto flex items-center justify-center gap-1.5 group/button whitespace-nowrap">
           <svg
-            className="w-5 h-5 group-hover/button:animate-bounce"
+            className="w-[14px] h-[14px] sm:w-5 sm:h-5 group-hover/button:animate-bounce flex-shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -138,7 +145,7 @@ const ProductCard = ({ product }) => {
               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
             />
           </svg>
-          ADD TO CART
+          <span className="tracking-normal">ADD TO CART</span>
         </button>
       </div>
     </div>

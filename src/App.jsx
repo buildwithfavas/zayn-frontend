@@ -6,6 +6,8 @@ import Home from "./pages/user/Home";
 import Login from "./pages/user/Login";
 import NewPassword from "./pages/user/NewPassword";
 import OTPVerification from "./pages/user/OTPVerification";
+import ProductListing from "./pages/user/ProductListing";
+import ProductDetails from "./pages/user/ProductDetails";
 import Signup from "./pages/user/Signup";
 
 function App() {
@@ -17,6 +19,22 @@ function App() {
         element={
           <UserLayout>
             <Home />
+          </UserLayout>
+        }
+      />
+      <Route
+        path="/products"
+        element={
+          <UserLayout>
+            <ProductListing />
+          </UserLayout>
+        }
+      />
+      <Route
+        path="/products/:id"
+        element={
+          <UserLayout>
+            <ProductDetails />
           </UserLayout>
         }
       />

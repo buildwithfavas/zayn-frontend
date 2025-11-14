@@ -1,15 +1,17 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { name: "Home", href: "#" },
-    { name: "Fashion", href: "#" },
-    { name: "Bags", href: "#" },
-    { name: "Footwear", href: "#" },
-    { name: "Beauty", href: "#" },
-    { name: "Jewellery", href: "#" },
+    { name: "Home", href: "/" },
+    { name: "Products", href: "/products" },
+    { name: "Fashion", href: "/products" },
+    { name: "Bags", href: "/products" },
+    { name: "Footwear", href: "/products" },
+    { name: "Beauty", href: "/products" },
+    { name: "Jewellery", href: "/products" },
   ];
 
   return (
@@ -30,13 +32,13 @@ const Navigation = () => {
           {/* Navigation Links - Hidden on mobile, shown on desktop */}
           <div className="hidden lg:flex items-center gap-4 xl:gap-6">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.href}
                 className="text-gray-700 hover:text-gray-900 font-medium text-sm xl:text-base"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -44,13 +46,13 @@ const Navigation = () => {
           {mobileMenuOpen && (
             <div className="lg:hidden bg-gray-50 rounded-lg p-4 space-y-2">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
-                  href={link.href}
+                  to={link.href}
                   className="block text-gray-700 hover:text-gray-900 font-medium py-2"
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
               <a
                 href="#"
