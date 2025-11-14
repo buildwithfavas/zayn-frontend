@@ -49,7 +49,7 @@ const HeroSlider = ({
   };
 
   return (
-    <div className="relative w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px] bg-gray-900 overflow-hidden rounded-xl md:rounded-2xl">
+    <div className="relative w-full h-[200px] sm:h-[260px] md:h-[320px] lg:h-[400px] bg-gray-900 overflow-hidden rounded-xl md:rounded-2xl">
       {/* Slides */}
       {slides.map((slide, index) => (
         <div
@@ -86,7 +86,7 @@ const HeroSlider = ({
                 </p>
                 <a
                   href={slide.ctaLink || slide.buttonLink}
-                  className="inline-block bg-white text-gray-900 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-semibold hover:bg-gray-100 transition-colors text-sm sm:text-base"
+                  className="inline-block bg-white text-gray-900 px-3 sm:px-5 py-1.5 sm:py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors text-xs sm:text-sm"
                 >
                   {slide.ctaText || slide.buttonText}
                 </a>
@@ -99,20 +99,20 @@ const HeroSlider = ({
       {/* Navigation Arrows */}
       <button
         onClick={goToPrevious}
-        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-2 sm:p-3 rounded-full shadow-lg transition-all"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 bg-white/40 hover:bg-white backdrop-blur-sm p-1.5 sm:p-3 rounded-full shadow-lg transition-all"
         aria-label="Previous slide"
       >
-        <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
       <button
         onClick={goToNext}
-        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white p-2 sm:p-3 rounded-full shadow-lg transition-all"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 bg-white/40 hover:bg-white backdrop-blur-sm p-1.5 sm:p-3 rounded-full shadow-lg transition-all"
         aria-label="Next slide"
       >
-        <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>

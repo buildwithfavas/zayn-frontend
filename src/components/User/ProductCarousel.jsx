@@ -66,7 +66,7 @@ const ProductCarousel = ({ title, products, showViewAll = true }) => {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {products.map((product) => (
-            <div key={product.id} className="flex-shrink-0 w-48 sm:w-56 md:w-64">
+            <div key={product.id} className="flex-shrink-0 w-1/2 sm:w-56 md:w-64">
               <ProductCard product={product} />
             </div>
           ))}

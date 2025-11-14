@@ -5,16 +5,16 @@ const FreeShippingBanner = () => {
       <div className="bg-gradient-to-r from-pink-500 via-pink-600 to-rose-500 rounded-xl md:rounded-2xl overflow-hidden shadow-xl">
         {/* Mobile Layout */}
         <div className="block sm:hidden">
-          <div className="px-5 py-6 text-center">
-            {/* Icon */}
-            <div className="flex justify-center mb-3">
-              <div className="bg-white/20 rounded-full p-3">
+          <div className="px-4 py-3 flex items-center gap-3">
+            {/* Icon (Left) */}
+            <div className="flex-shrink-0">
+              <div className="bg-white/20 rounded-full p-2">
                 <svg 
-                  className="w-8 h-8 text-white" 
+                  className="w-7 h-7 text-white" 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
-                  strokeWidth={2.5}
+                  strokeWidth={2}
                 >
                   <path 
                     strokeLinecap="round" 
@@ -24,23 +24,24 @@ const FreeShippingBanner = () => {
                 </svg>
               </div>
             </div>
-            
-            {/* Title */}
-            <h3 className="text-xl font-bold text-white mb-2">
-              🚚 Free Shipping
-            </h3>
-            
-            {/* Description */}
-            <p className="text-white/90 text-sm font-medium mb-3 leading-relaxed">
-              Free Delivery On Your First Order<br />
-              <span className="text-white font-semibold">& Orders Over ₹200</span>
-            </p>
-            
-            {/* Price Badge */}
-            <div className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-              <span className="text-white text-sm font-bold">
-                Only ₹200 Minimum*
-              </span>
+
+            {/* Text (Middle) */}
+            <div className="flex-grow min-w-0">
+              <h3 className="text-base font-bold text-white leading-tight mb-0.5 truncate">
+                🚚 Free Shipping
+              </h3>
+              <p className="text-white/90 text-[11px] leading-snug">
+                Free delivery on your first order & orders over ₹200
+              </p>
+            </div>
+
+            {/* Pill (Right) */}
+            <div className="flex-shrink-0">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                <span className="text-white text-[11px] font-bold whitespace-nowrap">
+                  Only ₹200*
+                </span>
+              </div>
             </div>
           </div>
         </div>

@@ -50,18 +50,18 @@ const ServicesSection = () => {
   ];
 
   return (
-    <section className="bg-gray-800 text-white py-6 sm:py-8">
+    <section className="bg-gray-800 text-white py-5 sm:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6">
           {services.map((service, index) => (
             <div
               key={index}
-              className="flex flex-col sm:flex-row items-center sm:items-start gap-3 text-center sm:text-left"
+              className="flex items-center gap-2.5 sm:gap-3 text-left"
             >
               {service.icon}
               <div>
                 <p className="font-semibold text-sm sm:text-base">{service.title}</p>
-                <p className="text-xs sm:text-sm text-gray-300">{service.description}</p>
+                <p className="text-[11px] sm:text-sm text-gray-300 leading-snug">{service.description}</p>
               </div>
             </div>
           ))}

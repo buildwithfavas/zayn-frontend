@@ -88,7 +88,7 @@ const PopularProductsSection = ({ title, subtitle, categoriesData }) => {
         >
           {activeProducts.length > 0 ? (
             activeProducts.map((product) => (
-              <div key={product.id} className="flex-shrink-0 w-64">
+              <div key={product.id} className="flex-shrink-0 w-1/2 sm:w-64">
                 <ProductCard product={product} />
               </div>
             ))

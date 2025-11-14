@@ -1,4 +1,3 @@
-import React from "react";
 import paymentCards from "../../assets/payment-cards.png";
 
 const Footer = () => {
@@ -20,9 +19,9 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-300 pt-8 sm:pt-10 pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-row-dense gap-3 sm:gap-5 md:gap-8 mb-6 sm:mb-8">
           {/* Contact Us */}
-          <div>
+          <div className="order-2 md:order-auto">
             <h4 className="font-semibold text-white mb-3 sm:mb-4 text-base sm:text-lg">Contact us</h4>
             <p className="text-xs sm:text-sm mb-2">Zayn Collection - Mega Super Store</p>
             <p className="text-xs sm:text-sm mb-2">507-Union Trade Centre France</p>
@@ -39,9 +38,9 @@ const Footer = () => {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="order-2 md:order-auto">
             <h4 className="font-semibold text-white mb-3 sm:mb-4 text-base sm:text-lg">Quick Links</h4>
-            <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
+            <ul className="grid grid-cols-2 md:grid-cols-1 gap-y-1 md:gap-y-2 gap-x-4 text-xs sm:text-sm">
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <a href={link.href} className="hover:text-white">
@@ -53,9 +52,9 @@ const Footer = () => {
           </div>
 
           {/* Our Company */}
-          <div>
+          <div className="order-2 md:order-auto">
             <h4 className="font-semibold text-white mb-3 sm:mb-4 text-base sm:text-lg">Our company</h4>
-            <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
+            <ul className="grid grid-cols-2 md:grid-cols-1 gap-y-1 md:gap-y-2 gap-x-4 text-xs sm:text-sm">
               {companyLinks.map((link) => (
                 <li key={link.name}>
                   <a href={link.href} className="hover:text-white">
@@ -67,7 +66,7 @@ const Footer = () => {
           </div>
 
           {/* Subscribe to Newsletter */}
-          <div>
+          <div className="order-1 md:order-auto">
             <h4 className="font-semibold text-white mb-3 sm:mb-4 text-base sm:text-lg">Subscribe to newsletter</h4>
             <p className="text-xs sm:text-sm mb-3 sm:mb-4">
               Subscribe to our latest newsletter to get news about special discounts.

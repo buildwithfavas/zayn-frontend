@@ -24,7 +24,7 @@ const PromoBanner = ({
 
   return (
     <div className="py-4">
-      <div className="relative rounded-2xl md:rounded-3xl overflow-hidden min-h-[350px] sm:min-h-[400px] lg:min-h-[450px]">
+      <div className="relative rounded-2xl md:rounded-3xl overflow-hidden min-h-[260px] sm:min-h-[320px] lg:min-h-[420px]">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
@@ -68,11 +68,11 @@ const PromoBanner = ({
 
         {/* Content Overlay - Only show if there's content */}
         {hasContent && (
-          <div className="relative z-20 px-6 sm:px-8 md:px-16 py-8 sm:py-10 lg:py-12 h-full flex flex-col justify-center">
-            <div className="max-w-xl lg:max-w-2xl space-y-4 sm:space-y-5">
+          <div className="relative z-20 px-4 sm:px-6 md:px-10 py-6 sm:py-8 lg:py-10 h-full flex flex-col justify-center">
+            <div className="max-w-xl lg:max-w-2xl space-y-3 sm:space-y-4">
               {/* Main Heading */}
               {title && (
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-black leading-[0.9] tracking-tight drop-shadow-sm">
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-black leading-[0.95] tracking-tight drop-shadow-sm">
                   {title.split('\n').map((line, index) => (
                     <span key={index}>
                       {line}
@@ -84,7 +84,7 @@ const PromoBanner = ({
               
               {/* Description */}
               {description && (
-                <p className="text-gray-800 text-sm sm:text-base lg:text-lg leading-relaxed max-w-lg font-medium drop-shadow-sm">
+                <p className="text-gray-800 text-xs sm:text-sm lg:text-base leading-relaxed max-w-lg font-medium drop-shadow-sm">
                   {description}
                 </p>
               )}
@@ -94,7 +94,7 @@ const PromoBanner = ({
                 <div className="pt-2 sm:pt-3">
                   <button 
                     onClick={handleButtonClick}
-                    className="bg-black text-white px-8 sm:px-10 py-3 sm:py-4 rounded-full text-sm sm:text-base lg:text-lg font-semibold hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    className="bg-black text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full text-xs sm:text-sm lg:text-base font-semibold hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
                   >
                     {buttonText}
                   </button>
@@ -103,13 +103,13 @@ const PromoBanner = ({
 
               {/* Stats */}
               {stats.length > 0 && (
-                <div className="flex flex-wrap gap-6 lg:gap-10 pt-4">
+                <div className="flex flex-wrap gap-4 lg:gap-8 pt-3">
                   {stats.map((stat, index) => (
                     <div key={index}>
-                      <div className="text-xl lg:text-2xl xl:text-3xl font-bold text-black">
+                      <div className="text-lg lg:text-xl xl:text-2xl font-bold text-black">
                         {stat.value}
                       </div>
-                      <div className="text-xs lg:text-sm text-gray-700 mt-1">
+                      <div className="text-[10px] lg:text-xs text-gray-700 mt-1">
                         {stat.label}
                       </div>
                     </div>

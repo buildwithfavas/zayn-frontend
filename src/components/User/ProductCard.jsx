@@ -98,33 +98,33 @@ const ProductCard = ({ product }) => {
       </div>
 
       {/* Product Info */}
-      <div className="p-3 sm:p-4 flex flex-col flex-grow">
+      <div className="p-2.5 sm:p-4 flex flex-col flex-grow">
         {/* Brand */}
         {brand && (
-          <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
+          <p className="hidden sm:block text-xs text-gray-500 mb-1 uppercase tracking-wide">
             {brand}
           </p>
         )}
 
         {/* Product Title */}
         <Link to={`/products/${product.id}`}>
-          <div className="h-12 mb-1.5 flex items-start">
-            <h3 className="text-base font-semibold text-gray-900 line-clamp-2 leading-6 hover:text-blue-600 transition-colors cursor-pointer">
+          <div className="h-10 sm:h-12 mb-1 flex items-start">
+            <h3 className="text-sm sm:text-base font-semibold text-gray-900 line-clamp-2 leading-5 sm:leading-6 hover:text-blue-600 transition-colors cursor-pointer">
               {displayTitle}
             </h3>
           </div>
         </Link>
 
         {/* Rating */}
-        <div className="flex items-center gap-1 mb-3">{renderStars()}</div>
+        <div className="hidden sm:flex items-center gap-1 mb-3">{renderStars()}</div>
 
         {/* Price */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-xl font-bold text-gray-900">
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <span className="text-lg sm:text-xl font-bold text-gray-900">
             ₹{price?.toLocaleString('en-IN')}
           </span>
           {displayOldPrice && (
-            <span className="text-sm text-gray-400 line-through">
+            <span className="text-xs sm:text-sm text-gray-400 line-through">
               ₹{displayOldPrice.toLocaleString('en-IN')}
             </span>
           )}
