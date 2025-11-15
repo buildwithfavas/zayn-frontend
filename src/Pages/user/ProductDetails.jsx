@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { allProducts } from '../../data/dummyProducts';
 import ProductCard from '../../components/user/ProductCard';
 
@@ -9,6 +9,33 @@ const ProductDetails = ({ product: incomingProduct, similarProducts: incomingSim
   const [activeTab, setActiveTab] = useState('description');
   const [quantity, setQuantity] = useState(1);
   const [similarPage, setSimilarPage] = useState(0);
+  const [isLarge, setIsLarge] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(min-width: 1024px)').matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const handler = (e) => setIsLarge(e.matches);
+    // Older Safari uses addListener
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handler);
+    } else if (mq.addListener) {
+      mq.addListener(handler);
+    }
+    return () => {
+      if (mq.removeEventListener) {
+        mq.removeEventListener('change', handler);
+      } else if (mq.removeListener) {
+        mq.removeListener(handler);
+      }
+    };
+  }, []);
+
+  const itemsPerPage = isLarge ? 5 : 6;
 
   // Sample product data (you can pass this as props or get from URL params)
   const fallbackProduct = {
@@ -372,11 +399,11 @@ const ProductDetails = ({ product: incomingProduct, similarProducts: incomingSim
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Similar Products</h2>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {[0, 1, 2, 3, 4].map((i) => {
-              const p = similarProducts[(similarPage * 5 + i) % similarProducts.length];
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {Array.from({ length: itemsPerPage }, (_, i) => {
+              const p = similarProducts[(similarPage * itemsPerPage + i) % similarProducts.length];
               return (
-                <ProductCard key={`${p.id}-${i}-${similarPage}`} product={p} />
+                <ProductCard key={`${p.id}-${i}-${similarPage}-${itemsPerPage}`} product={p} />
               );
             })}
           </div>

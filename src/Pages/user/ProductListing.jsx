@@ -44,8 +44,7 @@ const ProductListing = () => {
   const endProduct = Math.min(currentPage * productsPerPage, totalProducts);
 
   // Calculate dynamic pagination buttons (sliding window)
-  const getVisiblePages = () => {
-    const maxVisiblePages = 5;
+  const getVisiblePages = (maxVisiblePages) => {
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
     
@@ -61,7 +60,8 @@ const ProductListing = () => {
     return pages;
   };
 
-  const visiblePages = getVisiblePages();
+  const visiblePagesDesktop = getVisiblePages(5);
+  const visiblePagesMobile = getVisiblePages(3);
 
   // Clamp currentPage within valid bounds when total pages change (e.g., after filters)
   useEffect(() => {
@@ -76,12 +76,6 @@ const ProductListing = () => {
     }
   }, [totalPages]);
 
-  // Scroll to top on page change ONLY for tablet/desktop; keep position on mobile
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.matchMedia('(min-width: 640px)').matches) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [currentPage]);
 
   const sizes = ["38", "39", "40", "41", "42", "43", "44", "45", "46", "47"];
   const colors = [
@@ -411,7 +405,7 @@ const ProductListing = () => {
 
   return (
     <>
-    <div className="min-h-screen" style={{backgroundColor: '#e7e7e3'}}>
+    <div className="min-h-screen overflow-x-hidden" style={{backgroundColor: '#e7e7e3'}}>
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-2 sm:px-6 py-6">
         {/* Mobile Filters/Sort Bar */}
@@ -483,8 +477,8 @@ const ProductListing = () => {
               )}
             </div>
 
-            {/* Pagination (Mobile) — six buttons with dynamic middle: <, 1, [slotA], …, [slotB], last, > */}
-            <div className="sm:hidden flex items-center justify-center gap-2 mt-2">
+            {/* Pagination (Mobile) — dynamic window using visiblePages */}
+            <div className="sm:hidden flex flex-wrap items-center justify-center gap-2 mt-2 w-full">
               {/* Prev */}
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -494,65 +488,30 @@ const ProductListing = () => {
                 aria-label="Previous page"
               >&lt;</button>
 
-              {/* 1 */}
-              <button
-                onClick={() => setCurrentPage(1)}
-                className={`w-8 h-8 text-xs rounded-lg border ${currentPage === 1 ? 'bg-black text-white' : ''}`}
-                style={currentPage === 1
-                  ? { backgroundColor: '#232321', color: 'white', borderColor: '#232321' }
-                  : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
-              >1</button>
-
-              {/* slotA: show 2 normally, or currentPage when in the middle */}
-              {totalPages >= 2 && (() => {
-                const last = totalPages;
-                const slotA = (currentPage > 2 && currentPage < last - 1) ? currentPage : 2;
-                if (slotA === 1 || slotA === last) return null;
-                return (
-                  <button
-                    onClick={() => setCurrentPage(slotA)}
-                    className={`w-8 h-8 text-xs rounded-lg border ${currentPage === slotA ? 'bg-black text-white' : ''}`}
-                    style={currentPage === slotA
-                      ? { backgroundColor: '#232321', color: 'white', borderColor: '#232321' }
-                      : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
-                  >{slotA}</button>
-                );
-              })()}
-
-              {/* Ellipsis (show when there is a gap between left cluster and right cluster) */}
-              {(() => {
-                const last = totalPages;
-                const slotA = (currentPage > 2 && currentPage < last - 1) ? currentPage : 2;
-                return last > 4 && (last - slotA > 2);
-              })() && (
-                <span className="px-1 text-gray-400 text-xs">…</span>
-              )}
-
-              {/* slotB: normally last-1, unless current is last-1 (then highlight) */}
-              {(() => {
-                const last = totalPages;
-                const slotB = last - 1;
-                if (slotB <= 1) return null;
-                return (
-                  <button
-                    onClick={() => setCurrentPage(slotB)}
-                    className={`w-8 h-8 text-xs rounded-lg border ${currentPage === slotB ? 'bg-black text-white' : ''}`}
-                    style={currentPage === slotB
-                      ? { backgroundColor: '#232321', color: 'white', borderColor: '#232321' }
-                      : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
-                  >{slotB}</button>
-                );
-              })()}
-
-              {/* last (only if > 1) */}
-              {totalPages > 1 && (
+              {visiblePagesMobile.map(page => (
                 <button
-                  onClick={() => setCurrentPage(totalPages)}
-                  className={`w-8 h-8 text-xs rounded-lg border ${currentPage === totalPages ? 'bg-black text-white' : ''}`}
-                  style={currentPage === totalPages
+                  key={`m-${page}`}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-8 h-8 text-xs rounded-lg border ${currentPage === page ? 'bg-black text-white' : ''}`}
+                  style={currentPage === page
                     ? { backgroundColor: '#232321', color: 'white', borderColor: '#232321' }
                     : { backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
-                >{totalPages}</button>
+                >
+                  {page}
+                </button>
+              ))}
+
+              {visiblePagesMobile[visiblePagesMobile.length - 1] < totalPages && (
+                <>
+                  <span className="px-1 text-gray-400 text-xs">…</span>
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    className="w-8 h-8 text-xs rounded-lg border"
+                    style={{ backgroundColor: '#e7e7e3', color: '#232321', borderColor: '#232321' }}
+                  >
+                    {totalPages}
+                  </button>
+                </>
               )}
 
               {/* Next */}
@@ -574,7 +533,7 @@ const ProductListing = () => {
               >
                 &lt; PREVIOUS
               </button>
-              {visiblePages.map(page => (
+              {visiblePagesDesktop.map(page => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
@@ -586,7 +545,7 @@ const ProductListing = () => {
                   {page}
                 </button>
               ))}
-              {visiblePages[visiblePages.length - 1] < totalPages && (
+              {visiblePagesDesktop[visiblePagesDesktop.length - 1] < totalPages && (
                 <>
                   <span className="px-2 text-gray-400 text-sm">...</span>
                   <button
