@@ -1,6 +1,7 @@
 import { useState } from "react";
 import fashionPreview from "../../assets/fashion-preview.jpg";
 import UserLayout from "../../components/user/UserLayout";
+import toast from "react-hot-toast";
 
 const ForgotPassEmail = () => {
   const [email, setEmail] = useState("");
@@ -8,7 +9,7 @@ const ForgotPassEmail = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!email) {
-      alert("Please enter your email");
+      toast.error("Please enter your email");
       return;
     }
     // Replace with your backend API call

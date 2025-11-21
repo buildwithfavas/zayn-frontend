@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import shareIcon from "../../assets/share icon.png";
+import toast from "react-hot-toast";
 
 /**
  * ProductCard Component
@@ -102,7 +103,7 @@ const ProductCard = ({ product }) => {
             } else if (navigator.clipboard && navigator.clipboard.writeText) {
               navigator.clipboard.writeText(url).then(() => {
                 // simple fallback feedback
-                alert('Product link copied to clipboard');
+                toast.success('Product link copied to clipboard');
               }).catch(() => {
                 window.prompt('Copy this link:', url);
               });

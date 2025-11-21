@@ -1,22 +1,51 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import fashionPreview from "../../assets/fashion-preview.jpg";
 import UserLayout from "../../components/user/UserLayout";
+import toast from "react-hot-toast";
+
+const apiUrl = import.meta.env.VITE_API_URL || "";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      alert("Please enter both email and password");
+      toast.error("Please enter both email and password");
       return;
     }
-    // Replace with your backend API call
-    console.log("Login attempt:", { email, password, keepLoggedIn });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/user/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password, remember: keepLoggedIn }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || "Login failed");
+      toast.success(data.message || "Logged in successfully");
+      navigate("/");
+    } catch (err) {
+      toast.error(err.message || "Some error occurred");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -144,9 +173,10 @@ const Login = () => {
                   {/* Email Login Button */}
                   <button
                     type="submit"
-                    className="w-full bg-[#4A70E8] hover:bg-[#3d5fd4] text-white font-semibold py-3 rounded-lg transition uppercase tracking-wide text-sm sm:text-base flex items-center justify-between px-4"
+                    disabled={submitting}
+                    className="w-full bg-[#4A70E8] hover:bg-[#3d5fd4] disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition uppercase tracking-wide text-sm sm:text-base flex items-center justify-between px-4"
                   >
-                    <span>EMAIL LOGIN</span>
+                    <span>{submitting ? "LOGGING IN..." : "EMAIL LOGIN"}</span>
                     <svg
                       className="w-5 h-5"
                       fill="none"

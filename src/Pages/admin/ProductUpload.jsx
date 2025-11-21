@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const catData = [
   {
@@ -74,7 +75,7 @@ export default function ProductUpload() {
   function onSubmit(e) {
     e.preventDefault();
     if (!name.trim() || !description.trim() || !catId || !price) {
-      alert("Please complete required fields.");
+      toast.error("Please complete required fields.");
       return;
     }
     navigate("/admin/products");

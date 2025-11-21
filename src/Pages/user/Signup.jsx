@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import fashionPreview1 from "../../assets/fashion-preview1.jpg";
 import UserLayout from "../../components/user/UserLayout";
+import toast from "react-hot-toast";
 
 const Signup = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "";
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gender, setGender] = useState("");
@@ -12,26 +15,52 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!firstName || !lastName || !gender || !email || !password) {
-      alert("Please fill in all required fields");
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    const pwdOk = /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password) && password.length >= 8;
+    if (!pwdOk) {
+      toast.error("Password must be 8+ chars, include upper, lower, number and special character");
       return;
     }
     if (!agreeTerms) {
-      alert("Please agree to the terms and conditions");
+      toast.error("Please agree to the terms and conditions");
       return;
     }
-    // Replace with your backend API call
-    console.log("Registration attempt:", {
-      firstName,
-      lastName,
-      gender,
-      email,
-      password,
-      keepLoggedIn,
-    });
+    setSubmitting(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/user/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          gender,
+          email,
+          password,
+          remember: keepLoggedIn,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || "Signup failed");
+      toast.success(data.message || "Account created. Please login.");
+      navigate("/login");
+    } catch (err) {
+      toast.error(err.message || "Some error occurred");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleGoogleSignup = () => {
@@ -307,9 +336,10 @@ const Signup = () => {
                   {/* Register Button */}
                   <button
                     type="submit"
-                    className="w-full bg-[#4A70E8] hover:bg-[#3d5fd4] text-white font-semibold py-3 rounded-lg transition uppercase tracking-wide text-sm sm:text-base flex items-center justify-between px-4"
+                    disabled={submitting}
+                    className="w-full bg-[#4A70E8] hover:bg-[#3d5fd4] disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition uppercase tracking-wide text-sm sm:text-base flex items-center justify-between px-4"
                   >
-                    <span>REGISTER</span>
+                    <span>{submitting ? "CREATING..." : "REGISTER"}</span>
                     <svg
                       className="w-5 h-5"
                       fill="none"

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import UserLayout from "../../components/user/UserLayout";
+import toast from "react-hot-toast";
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -82,7 +83,7 @@ const OTPVerification = () => {
     const otpCode = otp.join("");
     
     if (otpCode.length !== 4) {
-      alert("Please enter the complete OTP");
+      toast.error("Please enter the complete OTP");
       return;
     }
     

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function ProductSizeCreate() {
   const [value, setValue] = useState("");
@@ -17,17 +18,18 @@ export default function ProductSizeCreate() {
     e.preventDefault();
     const v = value.trim();
     if (!v) {
-      alert("Please enter a product size.");
+      toast.error("Please enter a product size.");
       return;
     }
     const exists = rows.some((r) => r.name.toLowerCase() === v.toLowerCase());
     if (exists) {
-      alert("This size already exists.");
+      toast.error("This size already exists.");
       return;
     }
     const id = rows.length ? Math.max(...rows.map((r) => r.id)) + 1 : 1;
     setRows((prev) => [...prev, { id, name: v }]);
     setValue("");
+    toast.success("Size added");
   }
 
   function onStartEdit(row) {
@@ -37,17 +39,18 @@ export default function ProductSizeCreate() {
   function onSaveEdit() {
     const v = editValue.trim();
     if (!v) {
-      alert("Please enter a product size.");
+      toast.error("Please enter a product size.");
       return;
     }
     const exists = rows.some((r) => r.name.toLowerCase() === v.toLowerCase() && r.id !== editId);
     if (exists) {
-      alert("This size already exists.");
+      toast.error("This size already exists.");
       return;
     }
     setRows((prev) => prev.map((r) => (r.id === editId ? { ...r, name: v } : r)));
     setEditId(null);
     setEditValue("");
+    toast.success("Size updated");
   }
 
   function onDelete(id) {

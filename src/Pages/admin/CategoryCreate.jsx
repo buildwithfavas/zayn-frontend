@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function CategoryCreate() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export default function CategoryCreate() {
   function onSubmit(e) {
     e.preventDefault();
     if (!name || !file) {
-      alert("Please enter category name and choose an image.");
+      toast.error("Please enter category name and choose an image.");
       return;
     }
     navigate("/admin/categories");

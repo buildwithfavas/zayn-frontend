@@ -28,3 +28,6 @@ dist-ssr
 
 .windsurf/rules/kluster-code-verify.md
 .kluster
+
+
+.github/instructions/kluster-code-verify.instructions.md

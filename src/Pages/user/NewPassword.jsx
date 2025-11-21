@@ -1,6 +1,7 @@
 import { useState } from "react";
 import fashionPreview from "../../assets/fashion-preview.jpg";
 import UserLayout from "../../components/user/UserLayout";
+import toast from "react-hot-toast";
 
 const NewPassword = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -11,11 +12,11 @@ const NewPassword = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!newPassword || !confirmPassword) {
-      alert("Please fill in both password fields");
+      toast.error("Please fill in both password fields");
       return;
     }
     if (newPassword !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
     // Replace with your backend API call
