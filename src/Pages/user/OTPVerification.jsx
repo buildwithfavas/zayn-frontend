@@ -1,94 +1,70 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import UserLayout from "../../components/user/UserLayout";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
+import { CircularProgress } from "@mui/material";
+import { useResendOtpMutation, useVerifyEmailMutation } from "../../Store/Api/user/auth";
+import OtpBox from "../../components/user/OtpBox";
 
 const OTPVerification = () => {
-  const [otp, setOtp] = useState(["", "", "", ""]);
-  const [timer, setTimer] = useState(60); // 60 seconds countdown
-  const [canResend, setCanResend] = useState(false);
-  const [email] = useState("example@gmail.com"); // You can get this from props or state management
-  const inputRefs = useRef([]);
+  // RTK Query mutations
+  const [verifyEmail, { isLoading: isPending }] = useVerifyEmailMutation();
+  const [resend, { isLoading: isResending }] = useResendOtpMutation();
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(60);
+  const navigate = useNavigate();
+
+  // Get email from localStorage
+  const email = localStorage.getItem("userEmail");
+
+  // Timer logic based on expiry timestamp (persistent across refreshes)
+  const updateTimer = () => {
+    const expiry = Number(localStorage.getItem("otpExpiry"));
+    if (!expiry) return setTimer(0);
+
+    const remaining = Math.floor((expiry - Date.now()) / 1000);
+    setTimer(remaining > 0 ? remaining : 0);
+  };
 
   useEffect(() => {
-    // Start countdown timer
-    if (timer > 0 && !canResend) {
-      const interval = setInterval(() => {
-        setTimer((prevTimer) => {
-          if (prevTimer <= 1) {
-            setCanResend(true);
-            return 0;
-          }
-          return prevTimer - 1;
-        });
-      }, 1000);
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-      return () => clearInterval(interval);
-    }
-  }, [timer, canResend]);
+  const handleOtpChange = (value) => {
+    setOtp(value);
+  };
 
-  const handleOtpChange = (index, value) => {
-    // Only allow numbers
-    if (value && !/^\d$/.test(value)) {
-      return;
-    }
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Auto-focus next input
-    if (value && index < 3) {
-      inputRefs.current[index + 1]?.focus();
+  const handleResendOTP = async () => {
+    try {
+      const res = await resend({ email });
+      // Set new expiry time (60 seconds from now)
+      localStorage.setItem("otpExpiry", Date.now() + 60000);
+      updateTimer();
+      setOtp("");
+      toast.success(res.message || "OTP resent to your email");
+    } catch (error) {
+      toast.error(error.data || "Could not resend OTP");
     }
   };
 
-  const handleKeyDown = (index, e) => {
-    // Handle backspace
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").slice(0, 4);
-    const newOtp = [...otp];
-    
-    for (let i = 0; i < pastedData.length; i++) {
-      if (/^\d$/.test(pastedData[i])) {
-        newOtp[i] = pastedData[i];
-      }
-    }
-    
-    setOtp(newOtp);
-    // Focus the next empty input or the last one
-    const nextIndex = Math.min(pastedData.length, 3);
-    inputRefs.current[nextIndex]?.focus();
-  };
 
-  const handleResendOTP = () => {
-    if (canResend) {
-      // Reset timer and resend OTP
-      setTimer(60);
-      setCanResend(false);
-      setOtp(["", "", "", ""]);
-      inputRefs.current[0]?.focus();
-      // Add your resend OTP logic here
-      console.log("Resending OTP to:", email);
-    }
-  };
-
-  const handleVerify = (e) => {
-    e.preventDefault();
-    const otpCode = otp.join("");
-    
-    if (otpCode.length !== 4) {
+    if (otp.length !== 6) {
       toast.error("Please enter the complete OTP");
       return;
     }
-    
-    // Replace with your backend API call
-    console.log("Verifying OTP:", otpCode);
+
+    try {
+      const res = await verifyEmail({ otp, email }).unwrap();
+      navigate("/login");
+      toast.success(res.message || "User verified successfully");
+    } catch (error) {
+      toast.error(error.data || "Verification failed");
+    }
   };
 
   const formatTime = (seconds) => {
@@ -112,59 +88,55 @@ const OTPVerification = () => {
 
                 {/* Instruction Text */}
                 <p className="text-sm text-gray-700 mb-6 text-center">
-                  Code has been send to{" "}
-                  <span className="text-blue-600 font-medium">{email}</span>
+                  Code has been send to <span className="text-blue-600 font-medium">{email}</span>
                 </p>
 
                 {/* OTP Input Fields */}
                 <form onSubmit={handleVerify} className="space-y-6">
-                  <div className="flex justify-center gap-3 sm:gap-4">
-                    {otp.map((digit, index) => (
-                      <input
-                        key={index}
-                        ref={(el) => (inputRefs.current[index] = el)}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        value={digit}
-                        onChange={(e) => handleOtpChange(index, e.target.value)}
-                        onKeyDown={(e) => handleKeyDown(index, e)}
-                        onPaste={index === 0 ? handlePaste : undefined}
-                        className="w-14 h-14 sm:w-16 sm:h-16 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                      />
-                    ))}
-                  </div>
+                  <OtpBox length={6} onChange={handleOtpChange} />
 
                   {/* Resend OTP */}
                   <div className="text-center">
                     <p className="text-sm text-gray-700">
                       Didn't get the otp?{" "}
-                      {canResend ? (
+                      {timer === 0 ? (
                         <button
                           type="button"
                           onClick={handleResendOTP}
-                          className="text-blue-600 hover:text-blue-700 underline font-medium"
+                          disabled={isResending}
+                          className="text-blue-600 hover:text-blue-700 underline font-medium disabled:opacity-50"
                         >
-                          Resend
+                          {isResending ? <CircularProgress size={10} color="inherit" /> : "Resend"}
                         </button>
                       ) : (
                         <span className="text-gray-500">
                           Resend in{" "}
-                          <span className="font-semibold text-gray-700">
-                            {formatTime(timer)}
-                          </span>
+                          <span className="font-semibold text-gray-700">{formatTime(timer)}</span>
                         </span>
                       )}
                     </p>
+                    {timer === 0 && !isResending && (
+                      <p className="text-xs text-red-500 mt-1">OTP Expired</p>
+                    )}
                   </div>
 
                   {/* Verify OTP Button */}
-                  <button
+                  <Button
                     type="submit"
-                    className="w-full bg-[#4A70E8] hover:bg-[#3d5fd4] text-white font-semibold py-3 rounded-lg transition uppercase tracking-wide text-sm sm:text-base"
+                    disabled={isPending}
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      bgcolor: "#4A70E8",
+                      "&:hover": { bgcolor: "#3d5fd4" },
+                      py: 1.5,
+                      textTransform: "uppercase",
+                      fontWeight: "bold",
+                      borderRadius: 2,
+                    }}
                   >
-                    VERIFY OTP
-                  </button>
+                    {isPending ? <CircularProgress size={24} color="inherit" /> : "VERIFY OTP"}
+                  </Button>
                 </form>
               </div>
             </div>
@@ -176,4 +148,3 @@ const OTPVerification = () => {
 };
 
 export default OTPVerification;
-
