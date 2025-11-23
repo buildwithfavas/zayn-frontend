@@ -457,7 +457,7 @@ const ProductListing = () => {
 
         <div className="flex gap-8">
           {/* Left Sidebar - Filters */}
-          <div className="w-64 flex-shrink-0 hidden lg:block">
+          <div className="w-64 shrink-0 hidden lg:block">
             {renderFilters()}
           </div>
 

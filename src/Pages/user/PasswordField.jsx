@@ -12,7 +12,7 @@ const PasswordField = ({ label, register, errors, isSubmitting }) => {
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   return (
-    <FormControl sx={{ width: "100%" }} variant="outlined" className="w-full !mb-5 ">
+    <FormControl sx={{ width: "100%" }} variant="outlined" className="w-full mb-5! ">
       <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
       <OutlinedInput
         disabled={isSubmitting}
