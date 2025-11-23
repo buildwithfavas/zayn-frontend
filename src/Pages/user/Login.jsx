@@ -110,7 +110,7 @@ const Login = () => {
                   </Link>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
                   {/* Email Input */}
                   <div>
                     <TextField

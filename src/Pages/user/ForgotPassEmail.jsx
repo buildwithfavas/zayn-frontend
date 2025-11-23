@@ -1,19 +1,37 @@
-import { useState } from "react";
 import fashionPreview from "../../assets/fashion-preview.jpg";
 import UserLayout from "../../components/user/UserLayout";
 import toast from "react-hot-toast";
+import Button from "@mui/material/Button";
+import { useForm } from "react-hook-form";
+import { CircularProgress, TextField } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForgotPassEmailMutation } from "../../Store/Api/user/auth";
+import { forgotPassEmailSchema } from "../../Utils/YupSchemas";
 
 const ForgotPassEmail = () => {
-  const [email, setEmail] = useState("");
+  const [sendOtp, { isLoading }] = useForgotPassEmailMutation();
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(forgotPassEmailSchema),
+    mode: "onBlur",
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!email) {
-      toast.error("Please enter your email");
-      return;
+  const onSubmit = async (data) => {
+    try {
+      const res = await sendOtp(data).unwrap();
+      toast.success(res.message || "OTP Send Successfully");
+      localStorage.setItem("userEmail", data.email);
+      localStorage.setItem("otpExpiry", Date.now() + 60000);
+      localStorage.setItem("verificationType", "forgotPassword"); // Mark as forgot password flow
+      navigate("/verify");
+    } catch (error) {
+      toast.error(error.data || "Some Error Occurred");
     }
-    // Replace with your backend API call
-    console.log("Verifying email:", email);
   };
 
   return (
@@ -27,20 +45,40 @@ const ForgotPassEmail = () => {
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">
                   Forgot Password
                 </h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <input
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+                  <TextField
+                    {...register("email")}
+                    id="email"
+                    label="Enter your Email"
                     type="email"
-                    placeholder="Enter your Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    variant="outlined"
+                    fullWidth
+                    disabled={isLoading}
+                    error={!!errors.email}
+                    helperText={errors?.email?.message}
+                    sx={{
+                      "& .MuiInputBase-root": {
+                        height: "48px",
+                      },
+                    }}
                   />
-                  <button
+                  <Button
                     type="submit"
-                    className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition uppercase tracking-wide text-sm sm:text-base"
+                    disabled={isLoading}
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      bgcolor: "#4A70E8",
+                      "&:hover": { bgcolor: "#3d5fd4" },
+                      py: 1.5,
+                      mt: 2,
+                      textTransform: "uppercase",
+                      fontWeight: "bold",
+                      borderRadius: 2,
+                    }}
                   >
-                    VERIFY EMAIL
-                  </button>
+                    {isLoading ? <CircularProgress size={24} color="inherit" /> : "VERIFY EMAIL"}
+                  </Button>
                 </form>
               </div>
             </div>

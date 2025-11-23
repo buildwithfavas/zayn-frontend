@@ -47,6 +47,7 @@ const Signup = () => {
       toast.success(res.message || "User Registered Successfully");
       localStorage.setItem("userEmail", data.email);
       localStorage.setItem("otpExpiry", Date.now() + 60000);
+      localStorage.setItem("verificationType", "signup"); // Mark as signup flow
       navigate("/verify");
       reset();
     } catch (err) {
@@ -108,7 +109,7 @@ const Signup = () => {
                   <p className="text-sm text-gray-700 font-medium">OR</p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
                   {/* Your Name Section */}
                   <div>
                     <h3 className="text-sm font-medium text-gray-900 mb-3">Your Name</h3>

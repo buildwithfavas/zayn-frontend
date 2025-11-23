@@ -60,8 +60,25 @@ const OTPVerification = () => {
 
     try {
       const res = await verifyEmail({ otp, email }).unwrap();
-      navigate("/login");
-      toast.success(res.message || "User verified successfully");
+
+      // Check which flow the user came from
+      const verificationType = localStorage.getItem("verificationType");
+
+      if (verificationType === "forgotPassword") {
+        // Forgot password flow: redirect to reset password page
+        navigate("/new-password");
+        toast.success(res.message || "OTP verified successfully");
+      } else if (verificationType === "signup") {
+        // Signup flow: redirect to login page
+        navigate("/login");
+        toast.success(res.message || "User verified successfully");
+      } else {
+        // Fallback: if no verificationType found, assume signup
+        navigate("/login");
+        toast.error("User verification failed");
+      }
+      // Clean up
+      localStorage.removeItem("verificationType");
     } catch (error) {
       toast.error(error.data || "Verification failed");
     }
