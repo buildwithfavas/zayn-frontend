@@ -6,17 +6,33 @@ import ProductCard from "./ProductCard";
  * PopularProductsSection Component
  * Shows products with category filter tabs
  */
-const PopularProductsSection = ({ title, subtitle, categoriesData }) => {
-  const [activeCategory, setActiveCategory] = useState(categoriesData[0]?.id || "");
+const PopularProductsSection = ({
+  title,
+  subtitle,
+  categoriesData,
+  externalActiveCategory,
+  onCategoryChange,
+}) => {
+  const [internalActiveCategory, setInternalActiveCategory] = useState(categoriesData[0]?.id || "");
   const scrollContainerRef = useRef(null);
+
+  const activeCategory =
+    externalActiveCategory !== undefined ? externalActiveCategory : internalActiveCategory;
+  const handleCategoryChange = (newCategory) => {
+    if (onCategoryChange) {
+      onCategoryChange(newCategory);
+    } else {
+      setInternalActiveCategory(newCategory);
+    }
+  };
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
 
   // Get products for active category
-  const activeProducts = categoriesData.find(cat => cat.id === activeCategory)?.products || [];
+  const activeProducts = categoriesData.find((cat) => cat.id === activeCategory)?.products || [];
 
   // Extract category list for slider
-  const categories = categoriesData.map(cat => ({
+  const categories = categoriesData.map((cat) => ({
     id: cat.id,
     name: cat.name,
   }));
@@ -25,9 +41,7 @@ const PopularProductsSection = ({ title, subtitle, categoriesData }) => {
     const container = scrollContainerRef.current;
     if (container) {
       setShowLeftArrow(container.scrollLeft > 0);
-      setShowRightArrow(
-        container.scrollLeft < container.scrollWidth - container.clientWidth - 10
-      );
+      setShowRightArrow(container.scrollLeft < container.scrollWidth - container.clientWidth - 10);
     }
   };
 
@@ -47,21 +61,19 @@ const PopularProductsSection = ({ title, subtitle, categoriesData }) => {
         {/* Title and Category Tabs Row */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-2">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
-          
+
           {/* Category Slider on Right Side (Next Line on Mobile) */}
           <div className="flex-shrink-0 w-full sm:w-auto sm:max-w-md">
             <CategorySlider
               categories={categories}
               activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
+              onCategoryChange={handleCategoryChange}
             />
           </div>
         </div>
-        
+
         {/* Subtitle Below */}
-        {subtitle && (
-          <p className="text-sm text-gray-500">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
       </div>
 
       {/* Products Carousel */}
@@ -74,7 +86,12 @@ const PopularProductsSection = ({ title, subtitle, categoriesData }) => {
             aria-label="Scroll left"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
         )}
@@ -88,7 +105,7 @@ const PopularProductsSection = ({ title, subtitle, categoriesData }) => {
         >
           {activeProducts.length > 0 ? (
             activeProducts.map((product) => (
-              <div key={product.id} className="flex-shrink-0 w-1/2 sm:w-64">
+              <div key={product.id} className="shrink-0 w-1/2 sm:w-64">
                 <ProductCard product={product} />
               </div>
             ))

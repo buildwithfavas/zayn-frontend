@@ -10,9 +10,7 @@ const ProductCarousel = ({ title, products, showViewAll = true }) => {
     const container = scrollContainerRef.current;
     if (container) {
       setShowLeftArrow(container.scrollLeft > 0);
-      setShowRightArrow(
-        container.scrollLeft < container.scrollWidth - container.clientWidth - 10
-      );
+      setShowRightArrow(container.scrollLeft < container.scrollWidth - container.clientWidth - 10);
     }
   };
 
@@ -44,7 +42,7 @@ const ProductCarousel = ({ title, products, showViewAll = true }) => {
       </div>
 
       {/* Carousel Container */}
-      <div className="relative group/carousel px-6">
+      <div className="relative group/carousel">
         {/* Left Arrow */}
         {showLeftArrow && (
           <button
@@ -53,7 +51,12 @@ const ProductCarousel = ({ title, products, showViewAll = true }) => {
             aria-label="Scroll left"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
         )}
@@ -66,7 +69,7 @@ const ProductCarousel = ({ title, products, showViewAll = true }) => {
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {products.map((product) => (
-            <div key={product.id} className="flex-shrink-0 w-1/2 sm:w-56 md:w-64">
+            <div key={product.id} className="shrink-0 w-1/2 sm:w-56 md:w-64">
               <ProductCard product={product} />
             </div>
           ))}

@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 
 /**
  * ProductCard Component
- * 
+ *
  * @param {Object} product - Product object
  * @param {string} product.brand - Brand name
  * @param {string} product.title - Product title
@@ -52,7 +52,7 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col box-border border border-gray-100">
+    <div className="bg-white rounded-2xl overflow-hidden group shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col border border-gray-200 relative h-full">
       {/* Image Container */}
       <div className="relative bg-gray-50 aspect-square overflow-hidden">
         {/* Discount Badge */}
@@ -93,7 +93,7 @@ const ProductCard = ({ product }) => {
             const url = `${window.location.origin}/products/${product.id}`;
             const shareData = {
               title: displayTitle,
-              text: `${displayTitle}${price ? ` — ₹${price.toLocaleString('en-IN')}` : ''}`,
+              text: `${displayTitle}${price ? ` — ₹${price.toLocaleString("en-IN")}` : ""}`,
               url,
             };
             if (navigator.share) {
@@ -101,14 +101,17 @@ const ProductCard = ({ product }) => {
                 // fallback if user cancels
               });
             } else if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(url).then(() => {
-                // simple fallback feedback
-                toast.success('Product link copied to clipboard');
-              }).catch(() => {
-                window.prompt('Copy this link:', url);
-              });
+              navigator.clipboard
+                .writeText(url)
+                .then(() => {
+                  // simple fallback feedback
+                  toast.success("Product link copied to clipboard");
+                })
+                .catch(() => {
+                  window.prompt("Copy this link:", url);
+                });
             } else {
-              window.prompt('Copy this link:', url);
+              window.prompt("Copy this link:", url);
             }
           }}
           className="absolute top-14 right-3 bg-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 hover:scale-110 hover:bg-blue-50 group/share"
@@ -124,14 +127,15 @@ const ProductCard = ({ product }) => {
             alt={displayTitle}
             className="w-full h-full object-cover sm:group-hover:scale-105 transition-transform duration-300 cursor-pointer"
             onError={(e) => {
-              e.target.src = "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=400&fit=crop";
+              e.target.src =
+                "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=400&fit=crop";
             }}
           />
         </Link>
       </div>
 
       {/* Product Info */}
-      <div className="p-2.5 sm:p-4 flex flex-col flex-grow">
+      <div className="p-2.5 sm:p-4 flex flex-col grow">
         {/* Brand */}
         {brand && (
           <p className="hidden sm:block text-xs text-gray-500 mb-1 uppercase tracking-wide">
@@ -154,19 +158,20 @@ const ProductCard = ({ product }) => {
         {/* Price */}
         <div className="flex items-center gap-2 mb-3 sm:mb-4">
           <span className="text-lg sm:text-xl font-bold text-gray-900">
-            ₹{price?.toLocaleString('en-IN')}
+            ₹{price?.toLocaleString("en-IN")}
           </span>
           {displayOldPrice && (
             <span className="text-xs sm:text-sm text-gray-400 line-through">
-              ₹{displayOldPrice.toLocaleString('en-IN')}
+              ₹{displayOldPrice.toLocaleString("en-IN")}
             </span>
           )}
         </div>
 
         {/* Add to Cart Button */}
-        <button className="w-full bg-gray-900 text-white py-2 px-3 sm:py-3 sm:px-4 rounded-lg hover:bg-gray-800 transition-all text-[11px] sm:text-sm font-semibold mt-auto flex items-center justify-center gap-1.5 group/button whitespace-nowrap">
+        {/* Add to Cart Button */}
+        <button className="w-full bg-gray-900 text-white py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl hover:bg-black transition-all text-[11px] sm:text-sm font-bold mt-auto flex items-center justify-center gap-2 group/button shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap">
           <svg
-            className="w-[14px] h-[14px] sm:w-5 sm:h-5 group-hover/button:animate-bounce flex-shrink-0"
+            className="w-4 h-4 sm:w-5 sm:h-5 group-hover/button:animate-bounce shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -178,7 +183,7 @@ const ProductCard = ({ product }) => {
               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
             />
           </svg>
-          <span className="tracking-normal">ADD TO CART</span>
+          <span className="tracking-wide">ADD TO CART</span>
         </button>
       </div>
     </div>
