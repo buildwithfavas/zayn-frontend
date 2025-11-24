@@ -131,7 +131,11 @@ export default function CategoryCreate() {
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Category Name"
+                  label={
+                    <>
+                      Category Name <span style={{ color: "red" }}>*</span>
+                    </>
+                  }
                   placeholder="e.g. Fashion"
                   fullWidth
                   size="small"

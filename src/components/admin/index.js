@@ -6,3 +6,7 @@ export { default as OfferModal } from "./OfferModal";
 export { default as CategoryListTable } from "./CategoryListTable";
 export { default as SearchBox } from "./SearchBox";
 export { default as ImageUploadBox } from "./ImageUploadBox";
+export { default as SubcategoryModal } from "./SubcategoryModal";
+export { default as SubcategoryActions } from "./SubcategoryActions";
+export { default as CategoryItem } from "./CategoryItem";
+export { default as SubcategoryItem } from "./SubcategoryItem";

@@ -17,6 +17,8 @@ export const adminCategoryApi = adminApi.injectEndpoints({
         params,
       }),
       providesTags: ["Category"],
+      keepUnusedDataFor: 0, // Don't cache data, always fetch fresh
+      refetchOnMountOrArgChange: true, // Always refetch when component mounts or args change
     }),
     getAllCategories: builder.query({
       query: (params) => ({
