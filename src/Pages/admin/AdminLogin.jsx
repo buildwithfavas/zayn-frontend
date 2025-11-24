@@ -1,27 +1,50 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useDispatch } from "react-redux";
+import { CircularProgress, TextField, Button } from "@mui/material";
+import { loginValidationSchema } from "../../utils/YupSchemas";
+import { useAdminLoginMutation } from "../../store/Api/admin/auth";
+import { setAdmin } from "../../store/StoreSlices/adminAuthSlice";
+import PasswordField from "../user/PasswordField";
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      toast.error("Please enter both email and password");
-      return;
-    }
-    // TODO: Replace with admin auth API call
-    console.log("Admin login attempt:", { email });
+  const [login, { isLoading }] = useAdminLoginMutation();
+
+  // Prevent back navigation to login page after login
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = () => {
+      navigate("/admin/login", { replace: true });
+    };
+    return () => {
+      window.onpopstate = null;
+    };
+  }, [navigate]);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    mode: "onBlur",
+    resolver: yupResolver(loginValidationSchema),
+  });
+
+  const onSubmit = async (data) => {
     try {
-      localStorage.setItem("adminAuthed", "true");
-    } catch {}
-    const from = location.state?.from?.pathname || "/admin";
-    navigate(from, { replace: true });
+      const res = await login(data).unwrap();
+      toast.success(res.message || "Admin logged in successfully");
+      dispatch(setAdmin(res.admin));
+      navigate("/admin");
+    } catch (error) {
+      toast.error(error?.data?.message || "Login failed");
+    }
   };
 
   return (
@@ -32,90 +55,58 @@ const AdminLogin = () => {
             Admin Sign In
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <input
+              <TextField
+                {...register("email")}
                 id="email"
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                label="Email"
+                type="text"
+                variant="outlined"
+                fullWidth
+                disabled={isLoading}
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
             </div>
 
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <div>
+              <PasswordField
+                label="Password"
+                register={register("password")}
+                errors={errors.password?.message}
+                isSubmitting={isLoading}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                )}
-              </button>
             </div>
 
-            <button
+            <Button
               type="submit"
-              className="w-full bg-[#4A70E8] hover:bg-[#3d5fd4] text-white font-semibold py-3 rounded-lg transition uppercase tracking-wide text-sm sm:text-base flex items-center justify-between px-4"
+              disabled={isLoading}
+              variant="contained"
+              fullWidth
+              sx={{
+                bgcolor: "#4A70E8",
+                "&:hover": { bgcolor: "#3d5fd4" },
+                py: 1.5,
+                textTransform: "uppercase",
+                fontWeight: "bold",
+                borderRadius: 2,
+              }}
+              endIcon={
+                !isLoading && (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                )
+              }
             >
-              <span>SIGN IN</span>
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
+              {isLoading ? <CircularProgress size={24} color="inherit" /> : "SIGN IN"}
+            </Button>
           </form>
         </div>
       </div>

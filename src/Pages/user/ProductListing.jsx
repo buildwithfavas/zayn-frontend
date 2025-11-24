@@ -6,6 +6,8 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Typography from "@mui/material/Typography";
 import ProductCard from "../../components/user/ProductCard";
 import { useGetProductsQuery } from "../../store/Api/admin/product";
+import { useGetCategoriesByLevelQuery } from "../../store/Api/admin/category";
+import { useGetSizesQuery } from "../../store/Api/admin/size";
 import { setParams, clearParams } from "../../store/StoreSlices/uiSlice";
 
 const ProductListing = () => {
@@ -18,15 +20,17 @@ const ProductListing = () => {
     refetchOnMountOrArgChange: true,
   });
 
-  const [selectedFilters, setSelectedFilters] = useState({
-    size: [],
-    color: [],
-    categories: [],
-    gender: [],
-    brand: [],
-    price: [0, 10000],
-    rating: [],
-  });
+  // Fetch Categories for Filters
+  const { data: rootCatsData } = useGetCategoriesByLevelQuery({ level: "first" });
+  const { data: subCatsData } = useGetCategoriesByLevelQuery({ level: "second" });
+  const { data: thirdCatsData } = useGetCategoriesByLevelQuery({ level: "third" });
+  const { data: sizesData } = useGetSizesQuery();
+
+  const rootCats = rootCatsData?.categories?.filter((cat) => !cat.isBlocked) || [];
+  const subCats = subCatsData?.categories?.filter((cat) => !cat.isBlocked) || [];
+  const thirdCats = thirdCatsData?.categories?.filter((cat) => !cat.isBlocked) || [];
+  const sizesList = sizesData?.sizes || [];
+
   const [expandedSections, setExpandedSections] = useState({
     refineBy: true,
     size: true,
@@ -105,7 +109,7 @@ const ProductListing = () => {
     }
   }, [catParams, dispatch]);
 
-  const sizes = ["38", "39", "40", "41", "42", "43", "44", "45", "46", "47"];
+  // Hardcoded for now as no API endpoint found for these yet
   const colors = [
     { name: "Blue", class: "bg-blue-600" },
     { name: "Orange", class: "bg-orange-500" },
@@ -118,17 +122,9 @@ const ProductListing = () => {
     { name: "Brown", class: "bg-amber-700" },
     { name: "Light Brown", class: "bg-orange-300" },
   ];
-  const categories = [
-    "Casual Shoes",
-    "Runners",
-    "Hiking",
-    "Sneaker",
-    "Basketball",
-    "Golf",
-    "Outdoor",
-  ];
+
   const genders = ["Men", "Women"];
-  const brands = ["Adidas", "Puma"];
+  const brands = ["Adidas", "Puma", "Nike", "Reebok"]; // Example brands
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -138,24 +134,33 @@ const ProductListing = () => {
   };
 
   const toggleFilter = (type, value) => {
-    setSelectedFilters((prev) => ({
-      ...prev,
-      [type]: prev[type].includes(value)
-        ? prev[type].filter((item) => item !== value)
-        : [...prev[type], value],
-    }));
+    let updatedParams = {};
+    let currentValues = params[type] ? [...params[type]] : [];
+
+    if (currentValues.includes(value)) {
+      currentValues = currentValues.filter((item) => item !== value);
+    } else {
+      currentValues.push(value);
+    }
+
+    updatedParams[type] = currentValues;
+    dispatch(setParams(updatedParams));
   };
 
   const clearAllFilters = () => {
-    setSelectedFilters({
-      size: [],
-      color: [],
-      categories: [],
-      gender: [],
-      brand: [],
-      price: [0, 10000],
-      rating: [],
-    });
+    dispatch(clearParams());
+    // Re-apply category params if needed, but clearParams clears everything.
+    // We might want to keep the current category context.
+    // Actually, clearParams in uiSlice might clear everything including category.
+    // Let's check uiSlice.js to be sure.
+    // For now, assuming clearParams clears filters.
+    // If we are on a category page, we should probably re-dispatch the category params.
+    if (catParams.category) {
+      let p = { category: [catParams.category] };
+      if (catParams.subCategory) p.subCategory = catParams.subCategory;
+      if (catParams.thirdCategory) p.thirdCategory = catParams.thirdCategory;
+      dispatch(setParams(p));
+    }
   };
 
   const toUppercase = (value) => {
@@ -187,7 +192,7 @@ const ProductListing = () => {
         onToggle={() => toggleSection("refineBy")}
       >
         <div className="flex flex-wrap gap-2">
-          {selectedFilters.size.map((size) => (
+          {params.sizes?.map((size) => (
             <span
               key={`size-${size}`}
               className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-lg"
@@ -195,15 +200,10 @@ const ProductListing = () => {
               Size {size}
             </span>
           ))}
-          {selectedFilters.color.map((color) => (
-            <span
-              key={`color-${color}`}
-              className="px-2 py-1 bg-green-600 text-white text-xs font-medium rounded-lg"
-            >
-              {color}
-            </span>
-          ))}
-          {selectedFilters.categories.map((category) => (
+          {/* Colors not yet in params, but if they were: */}
+          {/* {params.color?.map((color) => ( ... ))} */}
+
+          {params.category?.map((category) => (
             <span
               key={`category-${category}`}
               className="px-2 py-1 bg-purple-600 text-white text-xs font-medium rounded-lg"
@@ -211,7 +211,24 @@ const ProductListing = () => {
               {category}
             </span>
           ))}
-          {selectedFilters.gender.map((gender) => (
+          {params.subCategory?.map((category) => (
+            <span
+              key={`subcategory-${category}`}
+              className="px-2 py-1 bg-purple-600 text-white text-xs font-medium rounded-lg"
+            >
+              {category}
+            </span>
+          ))}
+          {params.thirdCategory?.map((category) => (
+            <span
+              key={`thirdcategory-${category}`}
+              className="px-2 py-1 bg-purple-600 text-white text-xs font-medium rounded-lg"
+            >
+              {category}
+            </span>
+          ))}
+
+          {params.gender?.map((gender) => (
             <span
               key={`gender-${gender}`}
               className="px-2 py-1 bg-pink-600 text-white text-xs font-medium rounded-lg"
@@ -219,7 +236,7 @@ const ProductListing = () => {
               {gender}
             </span>
           ))}
-          {selectedFilters.brand.map((brand) => (
+          {params.brand?.map((brand) => (
             <span
               key={`brand-${brand}`}
               className="px-2 py-1 bg-orange-600 text-white text-xs font-medium rounded-lg"
@@ -227,7 +244,7 @@ const ProductListing = () => {
               {brand}
             </span>
           ))}
-          {selectedFilters.rating.map((rating) => (
+          {params.rating?.map((rating) => (
             <span
               key={`rating-${rating}`}
               className="px-2 py-1 bg-yellow-600 text-white text-xs font-medium rounded-lg"
@@ -235,18 +252,20 @@ const ProductListing = () => {
               {rating} Stars
             </span>
           ))}
-          {selectedFilters.price[1] !== 10000 && (
+          {(params.minPrice || params.maxPrice) && (
             <span className="px-2 py-1 bg-red-600 text-white text-xs font-medium rounded-lg">
-              ₹{selectedFilters.price[0]} - ₹{selectedFilters.price[1].toLocaleString("en-IN")}
+              ₹{params.minPrice || 0} - ₹{(params.maxPrice || 10000).toLocaleString("en-IN")}
             </span>
           )}
-          {selectedFilters.size.length === 0 &&
-            selectedFilters.color.length === 0 &&
-            selectedFilters.categories.length === 0 &&
-            selectedFilters.gender.length === 0 &&
-            selectedFilters.brand.length === 0 &&
-            selectedFilters.rating.length === 0 &&
-            selectedFilters.price[1] === 10000 && (
+          {!params.sizes?.length &&
+            !params.category?.length &&
+            !params.subCategory?.length &&
+            !params.thirdCategory?.length &&
+            !params.gender?.length &&
+            !params.brand?.length &&
+            !params.rating?.length &&
+            !params.minPrice &&
+            !params.maxPrice && (
               <span className="text-gray-500 text-sm italic">No filters selected</span>
             )}
         </div>
@@ -259,26 +278,24 @@ const ProductListing = () => {
         onToggle={() => toggleSection("size")}
       >
         <div className="grid grid-cols-5 gap-3">
-          {sizes.map((size) => (
+          {sizesList.map((sizeObj) => (
             <button
               type="button"
-              key={size}
-              onClick={() => toggleFilter("size", size)}
+              key={sizeObj._id}
+              onClick={() => toggleFilter("sizes", sizeObj.label)}
               className={`w-10 h-10 text-sm font-medium rounded-lg ${
-                selectedFilters.size.includes(size)
+                params.sizes?.includes(sizeObj.label)
                   ? "bg-black text-white"
-                  : size === "39" || size === "40"
-                  ? "bg-gray-300 text-gray-500"
                   : "bg-white text-black border border-gray-200 hover:border-gray-300"
               }`}
             >
-              {size}
+              {sizeObj.label}
             </button>
           ))}
         </div>
       </FilterSection>
 
-      {/* Color */}
+      {/* Color - Hardcoded for now */}
       <FilterSection
         title="COLOR"
         isExpanded={expandedSections.color}
@@ -289,9 +306,9 @@ const ProductListing = () => {
             <button
               type="button"
               key={color.name}
-              onClick={() => toggleFilter("color", color.name)}
+              // onClick={() => toggleFilter("color", color.name)} // Color filter not yet supported in backend/params fully?
               className={`w-10 h-10 rounded-lg ${color.class} ${
-                selectedFilters.color.includes(color.name)
+                false // params.color?.includes(color.name)
                   ? "ring-2 ring-gray-900 ring-offset-2"
                   : "hover:ring-2 hover:ring-gray-400 hover:ring-offset-1"
               }`}
@@ -308,17 +325,55 @@ const ProductListing = () => {
         onToggle={() => toggleSection("categories")}
       >
         <div className="space-y-2">
-          {categories.map((category) => (
-            <label key={category} className="flex items-center">
-              <input
-                type="checkbox"
-                checked={selectedFilters.categories.includes(category)}
-                onChange={() => toggleFilter("categories", category)}
-                className="mr-2 text-blue-600"
-              />
-              <span className="text-sm text-gray-700">{category}</span>
-            </label>
-          ))}
+          {(() => {
+            let items = [];
+            if (catParams?.subCategory) {
+              items = thirdCats
+                .filter((cat) => cat.parentCatName == catParams.subCategory)
+                .map((cat) => (
+                  <label key={cat._id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={params.thirdCategory?.includes(cat.name)}
+                      onChange={() => toggleFilter("thirdCategory", cat.name)}
+                      className="mr-2 text-blue-600"
+                    />
+                    <span className="text-sm text-gray-700">{cat.name}</span>
+                  </label>
+                ));
+            } else if (catParams?.category) {
+              items = subCats
+                .filter((cat) => cat.parentCatName == catParams.category)
+                .map((cat) => (
+                  <label key={cat._id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={params.subCategory?.includes(cat.name)}
+                      onChange={() => toggleFilter("subCategory", cat.name)}
+                      className="mr-2 text-blue-600"
+                    />
+                    <span className="text-sm text-gray-700">{cat.name}</span>
+                  </label>
+                ));
+            } else {
+              items = rootCats.map((cat) => (
+                <label key={cat._id} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={params.category?.includes(cat.name)}
+                    onChange={() => toggleFilter("category", cat.name)}
+                    className="mr-2 text-blue-600"
+                  />
+                  <span className="text-sm text-gray-700">{cat.name}</span>
+                </label>
+              ));
+            }
+            return items.length > 0 ? (
+              items
+            ) : (
+              <span className="text-sm text-gray-500">No categories available</span>
+            );
+          })()}
         </div>
       </FilterSection>
 
@@ -333,7 +388,7 @@ const ProductListing = () => {
             <label key={gender} className="flex items-center">
               <input
                 type="checkbox"
-                checked={selectedFilters.gender.includes(gender)}
+                checked={params.gender?.includes(gender)}
                 onChange={() => toggleFilter("gender", gender)}
                 className="mr-2 text-blue-600"
               />
@@ -354,7 +409,7 @@ const ProductListing = () => {
             <label key={brand} className="flex items-center">
               <input
                 type="checkbox"
-                checked={selectedFilters.brand.includes(brand)}
+                checked={params.brand?.includes(brand)}
                 onChange={() => toggleFilter("brand", brand)}
                 className="mr-2 text-blue-600"
               />
@@ -376,37 +431,20 @@ const ProductListing = () => {
               type="range"
               min="0"
               max="10000"
-              value={selectedFilters.price[1]}
+              value={params.maxPrice || 10000}
               onInput={(e) => {
-                setSelectedFilters((prev) => ({
-                  ...prev,
-                  price: [0, parseInt(e.target.value)],
-                }));
-              }}
-              onChange={(e) => {
-                setSelectedFilters((prev) => ({
-                  ...prev,
-                  price: [0, parseInt(e.target.value)],
-                }));
-              }}
-              onMouseMove={(e) => {
-                if (e.buttons === 1) {
-                  setSelectedFilters((prev) => ({
-                    ...prev,
-                    price: [0, parseInt(e.target.value)],
-                  }));
-                }
+                dispatch(setParams({ maxPrice: parseInt(e.target.value) }));
               }}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               style={{
                 background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${
-                  (selectedFilters.price[1] / 10000) * 100
-                }%, #e5e7eb ${(selectedFilters.price[1] / 10000) * 100}%, #e5e7eb 100%)`,
+                  ((params.maxPrice || 10000) / 10000) * 100
+                }%, #e5e7eb ${((params.maxPrice || 10000) / 10000) * 100}%, #e5e7eb 100%)`,
               }}
             />
             <div className="flex justify-between text-sm text-gray-600 mt-2">
-              <span>₹{selectedFilters.price[0]}</span>
-              <span>₹{selectedFilters.price[1].toLocaleString("en-IN")}</span>
+              <span>₹{params.minPrice || 0}</span>
+              <span>₹{(params.maxPrice || 10000).toLocaleString("en-IN")}</span>
             </div>
           </div>
         </div>
@@ -423,7 +461,7 @@ const ProductListing = () => {
             <label key={rating} className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={selectedFilters.rating.includes(rating)}
+                checked={params.rating?.includes(rating)}
                 onChange={() => toggleFilter("rating", rating)}
                 className="mr-3 text-blue-600"
               />

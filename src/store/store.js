@@ -25,11 +25,10 @@ export const store = configureStore({
     cart: cartReducer,
     orderItems: persistReducer(orderPersistConfig, orderReducer),
   },
-  middleware: (getDefault) => [
-    ...getDefault(),
-    userApi.middleware,
-    adminApi.middleware,
-  ],
+  middleware: (getDefault) =>
+    getDefault({
+      serializableCheck: false,
+    }).concat(userApi.middleware, adminApi.middleware),
 });
 
 export const persistor = persistStore(store);

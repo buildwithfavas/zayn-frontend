@@ -33,6 +33,13 @@ export const adminCategoryApi = adminApi.injectEndpoints({
       }),
       invalidatesTags: ["Category"],
     }),
+    deleteCategory: builder.mutation({
+      query: (id) => ({
+        url: `/category/${id}`,
+        method: "delete",
+      }),
+      invalidatesTags: ["Category"],
+    }),
     editCategory: builder.mutation({
       query: (data) => ({
         url: `/category/edit/${data.id}`,
@@ -48,6 +55,7 @@ export const {
   useCategoryAddMutation,
   useGetAllCategoriesQuery,
   useBlockCategoryMutation,
+  useDeleteCategoryMutation,
   useEditCategoryMutation,
   useGetCategoriesByLevelQuery,
 } = adminCategoryApi;

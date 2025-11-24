@@ -4,7 +4,7 @@ import adminInstance from "./Instances/adminInstance";
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: axiosBaseQuery({
-    baseUrl: "/api/admin",
+    baseUrl: "http://localhost:8000/api/admin",
     instance: adminInstance,
   }),
   endpoints: () => ({}),

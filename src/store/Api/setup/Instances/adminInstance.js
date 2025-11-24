@@ -1,8 +1,7 @@
 import axios from "axios";
 
-const apiUrl = import.meta.env.VITE_API_URL;
 const adminInstance = axios.create({
-  baseURL: apiUrl,
+  baseURL: "http://localhost:8000",
 });
 
 adminInstance.interceptors.request.use(
