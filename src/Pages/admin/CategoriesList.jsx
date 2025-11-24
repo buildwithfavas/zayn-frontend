@@ -13,6 +13,7 @@ import {
   DeleteConfirmModal,
   EditCategoryModal,
   OfferModal,
+  SearchBox,
 } from "../../components/admin";
 
 export default function CategoriesList() {
@@ -20,6 +21,9 @@ export default function CategoriesList() {
   const [blockCategory] = useBlockCategoryMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
   const [editCategory] = useEditCategoryMutation();
+
+  // Search State
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Modal States
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
@@ -40,7 +44,12 @@ export default function CategoriesList() {
 
   // Admin should see ALL categories (including blocked ones)
   // Users will not see blocked categories (that filtering happens on the user-facing pages)
-  const categories = data?.categories || [];
+  const allCategories = data?.categories || [];
+
+  // Filter categories based on search query
+  const categories = allCategories.filter((category) =>
+    category.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Cleanup preview URL on unmount
   useEffect(() => {
@@ -167,12 +176,23 @@ export default function CategoriesList() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Page Title */}
+      <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Category List</h1>
+      </div>
+
+      {/* Search Box and Add Button */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex-1 max-w-md">
+          <SearchBox
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search categories..."
+          />
+        </div>
         <Link
           to="/admin/categories/new"
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 text-sm"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 text-sm font-medium whitespace-nowrap"
         >
           ADD CATEGORY
         </Link>
