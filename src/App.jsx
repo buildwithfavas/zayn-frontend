@@ -17,7 +17,6 @@ import UserDetails from "./pages/admin/UserDetails";
 import CategoriesList from "./pages/admin/CategoriesList";
 import CategoryCreate from "./pages/admin/CategoryCreate";
 import SubcategoriesList from "./pages/admin/SubcategoriesList";
-import SubcategoryCreate from "./pages/admin/SubcategoryCreate";
 import ProductList from "./pages/admin/ProductList";
 import ProductUpload from "./pages/admin/ProductUpload";
 import ProductSizeCreate from "./pages/admin/ProductSizeCreate";
@@ -60,10 +59,7 @@ function App() {
       <Route path="/new-password" element={<NewPassword />} />
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route
-        path="/admin/*"
-        element={<AdminLayout />}
-      >
+      <Route path="/admin/*" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="users" element={<Users />} />
@@ -71,7 +67,6 @@ function App() {
         <Route path="categories" element={<CategoriesList />} />
         <Route path="categories/new" element={<CategoryCreate />} />
         <Route path="subcategories" element={<SubcategoriesList />} />
-        <Route path="subcategories/new" element={<SubcategoryCreate />} />
         <Route path="products" element={<ProductList />} />
         <Route path="products/:id" element={<AdminProductDetails />} />
         <Route path="products/upload" element={<ProductUpload />} />
