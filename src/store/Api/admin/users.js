@@ -10,6 +10,13 @@ export const userManagementApi = adminApi.injectEndpoints({
       }),
       providesTags: ["Users"],
     }),
+    getUserStats: builder.query({
+      query: () => ({
+        url: "/users/stats",
+        method: "get",
+      }),
+      providesTags: ["Users"],
+    }),
     blockUser: builder.mutation({
       query: (id) => ({
         url: `/users/block/${id}`,
@@ -29,6 +36,7 @@ export const userManagementApi = adminApi.injectEndpoints({
 
 export const {
   useGetUsersQuery,
+  useGetUserStatsQuery,
   useBlockUserMutation,
   useGetUsersChartDataQuery,
 } = userManagementApi;

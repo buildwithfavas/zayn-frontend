@@ -11,10 +11,10 @@ export const adminCategoryApi = adminApi.injectEndpoints({
       invalidatesTags: ["Category"],
     }),
     getCategoriesByLevel: builder.query({
-      query: ({ level, params = "" }) => ({
+      query: ({ level, page = 1, perPage = 10, search = "", filter = "all" }) => ({
         url: `/category/${level}`,
         method: "get",
-        params,
+        params: { page, perPage, search, filter },
       }),
       providesTags: ["Category"],
       keepUnusedDataFor: 0, // Don't cache data, always fetch fresh

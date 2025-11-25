@@ -13,7 +13,7 @@ const CategoryItem = ({ cat, isOpen, onToggle, openSubs, onToggleSub, onAction }
         <KeyboardArrowDownIcon
           className={`transition-transform mr-2 text-gray-600 ${isOpen ? "rotate-180" : ""}`}
         />
-        <div className="font-medium text-gray-800 flex-grow">{cat.name}</div>
+        <div className="font-medium text-gray-800 grow">{cat.name}</div>
       </div>
 
       {/* Subcategories */}

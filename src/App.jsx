@@ -21,6 +21,7 @@ import ProductList from "./pages/admin/ProductList";
 import ProductUpload from "./pages/admin/ProductUpload";
 import ProductSizeCreate from "./pages/admin/ProductSizeCreate";
 import AdminProductDetails from "./pages/admin/AdminProductDetails";
+import PlaceholderPage from "./pages/admin/PlaceholderPage";
 
 function App() {
   return (
@@ -71,6 +72,16 @@ function App() {
         <Route path="products/:id" element={<AdminProductDetails />} />
         <Route path="products/upload" element={<ProductUpload />} />
         <Route path="product-sizes/new" element={<ProductSizeCreate />} />
+
+        {/* Placeholder Routes */}
+        <Route path="orders" element={<PlaceholderPage title="Orders" />} />
+        <Route path="home-slides" element={<PlaceholderPage title="Home Slides" />} />
+        <Route path="home-slides/new" element={<PlaceholderPage title="Add Home Slide" />} />
+        <Route path="banners" element={<PlaceholderPage title="Banners" />} />
+        <Route path="banners/new" element={<PlaceholderPage title="Add Banner" />} />
+        <Route path="coupons" element={<PlaceholderPage title="Coupons" />} />
+        <Route path="payment" element={<PlaceholderPage title="Payment" />} />
+        <Route path="referrals" element={<PlaceholderPage title="Referrals" />} />
       </Route>
     </Routes>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -8,22 +8,30 @@ import {
   useEditCategoryMutation,
 } from "../../store/Api/admin/category";
 import {
-  CategoryListTable,
   BlockConfirmModal,
   DeleteConfirmModal,
   EditCategoryModal,
   OfferModal,
-  SearchBox,
 } from "../../components/admin";
+import CategoryTable from "../../components/admin/CategoryTable";
+import { Search } from "@mui/icons-material";
 
 export default function CategoriesList() {
-  const { data, isLoading, refetch } = useGetCategoriesByLevelQuery({ level: "first" });
+  // Pagination & Search State
+  const [params, setParams] = useState({ page: 1, perPage: 10, search: "", filter: "all" });
+  const [searchInput, setSearchInput] = useState("");
+
+  const { data, isLoading, refetch } = useGetCategoriesByLevelQuery({
+    level: "first",
+    page: params.page,
+    perPage: params.perPage,
+    search: params.search,
+    filter: params.filter,
+  });
+
   const [blockCategory] = useBlockCategoryMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
   const [editCategory] = useEditCategoryMutation();
-
-  // Search State
-  const [searchQuery, setSearchQuery] = useState("");
 
   // Modal States
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
@@ -42,14 +50,18 @@ export default function CategoriesList() {
 
   const fileRef = useRef(null);
 
-  // Admin should see ALL categories (including blocked ones)
-  // Users will not see blocked categories (that filtering happens on the user-facing pages)
-  const allCategories = data?.categories || [];
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setParams((prev) => ({ ...prev, search: searchInput, page: 1 }));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
-  // Filter categories based on search query
-  const categories = allCategories.filter((category) =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const categories = data?.categories || [];
+  const totalCategories = data?.totalCategories || 0;
+  const totalPages = Math.ceil(totalCategories / params.perPage);
+  const currentPage = params.page;
 
   // Cleanup preview URL on unmount
   useEffect(() => {
@@ -57,6 +69,15 @@ export default function CategoriesList() {
       if (editForm.preview) URL.revokeObjectURL(editForm.preview);
     };
   }, [editForm.preview]);
+
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setParams((prev) => ({ ...prev, search: "", page: 1 }));
+  };
+
+  const handlePageChange = (newPage) => {
+    setParams((prev) => ({ ...prev, page: newPage }));
+  };
 
   // ==================== DELETE HANDLERS ====================
   const handleDeleteClick = (id) => {
@@ -183,25 +204,54 @@ export default function CategoriesList() {
 
       {/* Search Box and Add Button */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex-1 max-w-md">
-          <SearchBox
-            value={searchQuery}
-            onChange={setSearchQuery}
+        <div className="flex-1 max-w-md relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <Search className="w-4 h-4" />
+          </span>
+          <input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="Search categories..."
           />
+          {searchInput && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          )}
         </div>
-        <Link
-          to="/admin/categories/new"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 text-sm font-medium whitespace-nowrap"
-        >
-          ADD CATEGORY
-        </Link>
+
+        <div className="flex items-center gap-3">
+          <select
+            value={params.filter}
+            onChange={(e) => setParams((prev) => ({ ...prev, filter: e.target.value, page: 1 }))}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="blocked">Blocked</option>
+          </select>
+
+          <Link
+            to="/admin/categories/new"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 text-sm font-medium whitespace-nowrap"
+          >
+            ADD CATEGORY
+          </Link>
+        </div>
       </div>
 
       {/* Category Table */}
-      <CategoryListTable
+      <CategoryTable
         categories={categories}
         isLoading={isLoading}
+        totalCategories={totalCategories}
+        currentPage={currentPage}
+        perPage={params.perPage}
+        onPageChange={handlePageChange}
         onEdit={handleEditClick}
         onDelete={handleDeleteClick}
         onBlockToggle={handleBlockToggleClick}
