@@ -83,24 +83,22 @@ export default function CategoryTable({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onEdit(category)}
-                      className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                      className="p-1 text-blue-600 hover:bg-gray-100 rounded"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onOffer(category._id, category.offer)}
-                      className="p-1 text-purple-600 hover:bg-purple-50 rounded"
+                      className="p-1 text-indigo-600 hover:bg-gray-100 rounded"
                       title="Manage Offer"
                     >
                       <LocalOffer className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onBlockToggle(category._id, category.isBlocked)}
-                      className={`p-1 rounded ${
-                        category.isBlocked
-                          ? "text-green-600 hover:bg-green-50"
-                          : "text-orange-600 hover:bg-orange-50"
+                      className={`p-1 rounded hover:bg-gray-100 ${
+                        category.isBlocked ? "text-green-600" : "text-red-600"
                       }`}
                       title={category.isBlocked ? "Unblock" : "Block"}
                     >
@@ -112,7 +110,7 @@ export default function CategoryTable({
                     </button>
                     <button
                       onClick={() => onDelete(category._id)}
-                      className="p-1 text-red-600 hover:bg-red-50 rounded"
+                      className="p-1 text-red-600 hover:bg-gray-100 rounded"
                       title="Delete"
                     >
                       <Delete className="w-4 h-4" />

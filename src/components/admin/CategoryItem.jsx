@@ -13,7 +13,14 @@ const CategoryItem = ({ cat, isOpen, onToggle, openSubs, onToggleSub, onAction }
         <KeyboardArrowDownIcon
           className={`transition-transform mr-2 text-gray-600 ${isOpen ? "rotate-180" : ""}`}
         />
-        <div className="font-medium text-gray-800 grow">{cat.name}</div>
+        <div className="font-medium text-gray-800 grow flex items-center gap-2">
+          {cat.name}
+          {cat.isBlocked && (
+            <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+              Blocked
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Subcategories */}

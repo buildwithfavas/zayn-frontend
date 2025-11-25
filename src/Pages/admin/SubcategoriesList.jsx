@@ -19,27 +19,45 @@ import {
 } from "../../components/admin";
 
 export default function SubcategoriesList() {
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+
+  // Filter State
+  const [filter, setFilter] = useState("all");
+
   // Fetch categories data
+  // Paginate Root Categories
   const {
     data: rootData,
     isLoading: rootLoading,
     refetch: rootRefetch,
   } = useGetCategoriesByLevelQuery({
     level: "first",
+    page: page,
+    perPage: perPage,
+    filter: filter,
   });
+
+  // Fetch ALL subcategories to ensure we can build the tree for displayed root cats
   const {
     data: subData,
     isLoading: subLoading,
     refetch: subRefetch,
   } = useGetCategoriesByLevelQuery({
     level: "second",
+    perPage: 1000, // Fetch large number to get all
+    filter: filter,
   });
+
   const {
     data: thirdData,
     isLoading: thirdLoading,
     refetch: thirdRefetch,
   } = useGetCategoriesByLevelQuery({
     level: "third",
+    perPage: 1000, // Fetch large number to get all
+    filter: filter,
   });
 
   // Mutations
@@ -80,6 +98,7 @@ export default function SubcategoriesList() {
       return {
         id: cat._id,
         name: cat.name,
+        isBlocked: cat.isBlocked, // Include isBlocked
         subs,
       };
     });
@@ -87,27 +106,41 @@ export default function SubcategoriesList() {
 
   const catOptions = useMemo(() => data.map((c) => ({ id: c.id, name: c.name })), [data]);
 
-  // Expand all by default when data loads
+  const [isAllExpanded, setIsAllExpanded] = useState(true);
+
+  // Expand all by default when data loads, but preserve existing state
   React.useEffect(() => {
     if (data.length > 0) {
-      const allCats = {};
-      const allSubs = {};
-
-      data.forEach((cat) => {
-        allCats[cat.id] = true;
-        cat.subs.forEach((sub) => {
-          allSubs[sub.id] = true;
+      setOpenCats((prev) => {
+        const newState = { ...prev };
+        data.forEach((cat) => {
+          // Only set default if key doesn't exist
+          if (newState[cat.id] === undefined) {
+            newState[cat.id] = isAllExpanded;
+          }
         });
+        return newState;
       });
 
-      setOpenCats(allCats);
-      setOpenSubs(allSubs);
+      setOpenSubs((prev) => {
+        const newState = { ...prev };
+        data.forEach((cat) => {
+          cat.subs.forEach((sub) => {
+            // Only set default if key doesn't exist
+            if (newState[sub.id] === undefined) {
+              newState[sub.id] = isAllExpanded;
+            }
+          });
+        });
+        return newState;
+      });
     }
-  }, [data]);
+  }, [data, isAllExpanded]);
 
   const isLoading = rootLoading || subLoading || thirdLoading;
+  const totalCategories = rootData?.totalCategories || 0;
+  const totalPages = Math.ceil(totalCategories / perPage);
 
-  // ==================== TOGGLE HANDLERS ====================
   // ==================== TOGGLE HANDLERS ====================
   const toggleCat = (id) => {
     setOpenCats((p) => ({ ...p, [id]: !p[id] }));
@@ -117,25 +150,50 @@ export default function SubcategoriesList() {
     setOpenSubs((p) => ({ ...p, [id]: !p[id] }));
   };
 
-  const [isAllExpanded, setIsAllExpanded] = useState(true);
+  // Keep track of latest data for toggleAll to avoid stale closures
+  const dataRef = React.useRef(data);
+  React.useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
 
   const toggleAll = () => {
+    const currentData = dataRef.current;
     if (isAllExpanded) {
-      // Collapse all
-      setOpenCats({});
-      setOpenSubs({});
+      // Collapse all - explicitly set to false
+      setOpenCats((prev) => {
+        const next = { ...prev };
+        currentData.forEach((cat) => {
+          next[cat.id] = false;
+        });
+        return next;
+      });
+      setOpenSubs((prev) => {
+        const next = { ...prev };
+        currentData.forEach((cat) => {
+          cat.subs.forEach((sub) => {
+            next[sub.id] = false;
+          });
+        });
+        return next;
+      });
     } else {
       // Expand all
-      const allCats = {};
-      const allSubs = {};
-      data.forEach((cat) => {
-        allCats[cat.id] = true;
-        cat.subs.forEach((sub) => {
-          allSubs[sub.id] = true;
+      setOpenCats((prev) => {
+        const next = { ...prev };
+        currentData.forEach((cat) => {
+          next[cat.id] = true;
         });
+        return next;
       });
-      setOpenCats(allCats);
-      setOpenSubs(allSubs);
+      setOpenSubs((prev) => {
+        const next = { ...prev };
+        currentData.forEach((cat) => {
+          cat.subs.forEach((sub) => {
+            next[sub.id] = true;
+          });
+        });
+        return next;
+      });
     }
     setIsAllExpanded(!isAllExpanded);
   };
@@ -153,6 +211,9 @@ export default function SubcategoriesList() {
       await addCategory(categoryData).unwrap();
       toast.success(`${level === 2 ? "Subcategory" : "Sub-subcategory"} added successfully`);
       setModal({ type: null, payload: null });
+      // Refetch to show new data
+      subRefetch();
+      thirdRefetch();
     } catch (error) {
       console.error("Error adding:", error);
       toast.error(error?.data?.message || "Failed to add");
@@ -295,12 +356,31 @@ export default function SubcategoriesList() {
     }
   };
 
+  // Pagination Handlers
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handlePerPageChange = (e) => {
+    setPerPage(Number(e.target.value));
+    setPage(1); // Reset to first page
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Sub Category List</h1>
         <div className="flex gap-2">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="px-3 py-2 rounded-md border border-gray-300 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="blocked">Blocked</option>
+          </select>
           <button
             className="px-3 py-2 rounded-md text-blue-600 border border-blue-600 hover:bg-blue-50 text-sm font-medium"
             onClick={toggleAll}
@@ -326,17 +406,98 @@ export default function SubcategoriesList() {
               <CircularProgress />
             </div>
           ) : (
-            data.map((cat) => (
-              <CategoryItem
-                key={cat.id}
-                cat={cat}
-                isOpen={openCats[cat.id]}
-                onToggle={toggleCat}
-                openSubs={openSubs}
-                onToggleSub={toggleSub}
-                onAction={handleAction}
-              />
-            ))
+            <>
+              {data.map((cat) => (
+                <CategoryItem
+                  key={cat.id}
+                  cat={cat}
+                  isOpen={openCats[cat.id]}
+                  onToggle={toggleCat}
+                  openSubs={openSubs}
+                  onToggleSub={toggleSub}
+                  onAction={handleAction}
+                />
+              ))}
+
+              {/* Pagination Controls */}
+              {totalCategories > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-3 border-t border-gray-100 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <span>Category per page:</span>
+                    <select
+                      value={perPage}
+                      onChange={handlePerPageChange}
+                      className="border border-gray-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      {[10, 20, 30].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div>
+                      Showing {(page - 1) * perPage + 1}-{Math.min(page * perPage, totalCategories)}{" "}
+                      of {totalCategories}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handlePageChange(page - 1)}
+                        disabled={page === 1}
+                        className={`px-2.5 py-1 rounded border border-gray-300 text-sm ${
+                          page === 1
+                            ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                            : "text-gray-700 bg-white hover:bg-gray-50"
+                        }`}
+                      >
+                        Previous
+                      </button>
+
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        let pageNum;
+                        if (totalPages <= 5) {
+                          pageNum = i + 1;
+                        } else if (page <= 3) {
+                          pageNum = i + 1;
+                        } else if (page >= totalPages - 2) {
+                          pageNum = totalPages - 4 + i;
+                        } else {
+                          pageNum = page - 2 + i;
+                        }
+
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => handlePageChange(pageNum)}
+                            className={`px-2.5 py-1 rounded border border-gray-300 text-sm ${
+                              page === pageNum
+                                ? "text-white bg-blue-500"
+                                : "text-gray-700 bg-white hover:bg-gray-50"
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+
+                      <button
+                        onClick={() => handlePageChange(page + 1)}
+                        disabled={page === totalPages}
+                        className={`px-2.5 py-1 rounded border border-gray-300 text-sm ${
+                          page === totalPages
+                            ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                            : "text-gray-700 bg-white hover:bg-gray-50"
+                        }`}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

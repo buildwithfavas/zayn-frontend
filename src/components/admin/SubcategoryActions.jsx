@@ -1,10 +1,5 @@
 import React from "react";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import BlockIcon from "@mui/icons-material/Block";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import { Add, Edit, Delete, Block, LockOpen, LocalOffer } from "@mui/icons-material";
 
 /**
  * Action buttons for subcategories
@@ -30,18 +25,22 @@ const SubcategoryActions = ({
       {/* Add button - only for subcategories (level 2) */}
       {level !== 3 && (
         <button title="Add" onClick={onAdd} className="hover:text-blue-600 transition-colors">
-          <AddIcon fontSize="small" />
+          <Add fontSize="small" />
         </button>
       )}
 
       {/* Edit button */}
       <button title="Edit" onClick={onEdit} className="hover:text-blue-600 transition-colors">
-        <EditIcon fontSize="small" />
+        <Edit fontSize="small" />
       </button>
 
       {/* Delete button */}
-      <button title="Delete" onClick={onDelete} className="hover:text-red-600 transition-colors">
-        <DeleteIcon fontSize="small" />
+      <button
+        title="Delete"
+        onClick={onDelete}
+        className="text-red-600 hover:text-red-700 transition-colors"
+      >
+        <Delete fontSize="small" />
       </button>
 
       {/* Block / Unblock button */}
@@ -52,7 +51,7 @@ const SubcategoryActions = ({
           isBlocked ? "text-green-600 hover:text-green-700" : "text-red-600 hover:text-red-700"
         }`}
       >
-        {isBlocked ? <CheckCircleIcon fontSize="small" /> : <BlockIcon fontSize="small" />}
+        {isBlocked ? <LockOpen fontSize="small" /> : <Block fontSize="small" />}
       </button>
 
       {/* Offer button */}
@@ -61,7 +60,7 @@ const SubcategoryActions = ({
         onClick={onOffer}
         className="hover:text-orange-600 transition-colors"
       >
-        <LocalOfferIcon fontSize="small" />
+        <LocalOffer fontSize="small" />
       </button>
     </div>
   );

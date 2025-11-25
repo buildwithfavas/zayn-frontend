@@ -36,6 +36,7 @@ const SubcategoryModal = ({
 }) => {
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (open) {
@@ -45,11 +46,26 @@ const SubcategoryModal = ({
         setName("");
         setCategoryId("");
       }
+      setErrors({});
     }
   }, [open, type, currentName]);
 
+  const validate = () => {
+    const newErrors = {};
+    if (!name.trim()) {
+      newErrors.name = "Name is required";
+    }
+    if (showCategorySelect && !categoryId) {
+      newErrors.categoryId = "Category is required";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = () => {
-    onSave({ name, categoryId });
+    if (validate()) {
+      onSave({ name, categoryId });
+    }
   };
 
   const title =
@@ -81,13 +97,18 @@ const SubcategoryModal = ({
         </Typography>
 
         {showCategorySelect && (
-          <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormControl fullWidth sx={{ mb: 2 }} error={!!errors.categoryId}>
             <InputLabel id="category-select-label">Select Category</InputLabel>
             <Select
               labelId="category-select-label"
               value={categoryId}
               label="Select Category"
-              onChange={(e) => setCategoryId(e.target.value)}
+              onChange={(e) => {
+                setCategoryId(e.target.value);
+                if (errors.categoryId) {
+                  setErrors({ ...errors, categoryId: null });
+                }
+              }}
             >
               {categoryOptions.map((cat) => (
                 <MenuItem key={cat.id} value={cat.id}>
@@ -95,6 +116,11 @@ const SubcategoryModal = ({
                 </MenuItem>
               ))}
             </Select>
+            {errors.categoryId && (
+              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                {errors.categoryId}
+              </Typography>
+            )}
           </FormControl>
         )}
 
@@ -103,9 +129,16 @@ const SubcategoryModal = ({
           variant="outlined"
           fullWidth
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (errors.name) {
+              setErrors({ ...errors, name: null });
+            }
+          }}
           sx={{ mb: 2 }}
           placeholder="Enter name"
+          error={!!errors.name}
+          helperText={errors.name}
         />
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
