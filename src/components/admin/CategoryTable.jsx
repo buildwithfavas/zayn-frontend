@@ -83,22 +83,24 @@ export default function CategoryTable({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onEdit(category)}
-                      className="p-1 text-blue-600 hover:bg-gray-100 rounded"
+                      className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onOffer(category._id, category.offer)}
-                      className="p-1 text-indigo-600 hover:bg-gray-100 rounded"
+                      className="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
                       title="Manage Offer"
                     >
                       <LocalOffer className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onBlockToggle(category._id, category.isBlocked)}
-                      className={`p-1 rounded hover:bg-gray-100 ${
-                        category.isBlocked ? "text-green-600" : "text-red-600"
+                      className={`p-1 rounded transition-colors ${
+                        category.isBlocked
+                          ? "text-green-600 hover:bg-green-50"
+                          : "text-red-600 hover:bg-red-50"
                       }`}
                       title={category.isBlocked ? "Unblock" : "Block"}
                     >
@@ -110,7 +112,7 @@ export default function CategoryTable({
                     </button>
                     <button
                       onClick={() => onDelete(category._id)}
-                      className="p-1 text-red-600 hover:bg-gray-100 rounded"
+                      className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Delete"
                     >
                       <Delete className="w-4 h-4" />
@@ -122,6 +124,32 @@ export default function CategoryTable({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {/* Empty State */}
+      {!isLoading && totalCategories === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <div className="bg-gray-100 p-4 rounded-full mb-3">
+            <svg
+              className="w-8 h-8 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+              />
+            </svg>
+          </div>
+          <p className="text-lg font-medium text-gray-900">No categories found</p>
+          <p className="text-sm">
+            Try adjusting your search or filter to find what you're looking for.
+          </p>
+        </div>
+      )}
 
       {/* Pagination */}
       {totalCategories > 0 && (

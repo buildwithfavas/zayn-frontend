@@ -25,9 +25,9 @@ export default function ProductList() {
   const [confirm, setConfirm] = useState({ open: false, id: null });
 
   // Fetch categories for filters
-  const { data: rootData } = useGetCategoriesByLevelQuery({ level: "first" });
-  const { data: subData } = useGetCategoriesByLevelQuery({ level: "second" });
-  const { data: thirdData } = useGetCategoriesByLevelQuery({ level: "third" });
+  const { data: rootData } = useGetCategoriesByLevelQuery({ level: "first", perPage: 1000 });
+  const { data: subData } = useGetCategoriesByLevelQuery({ level: "second", perPage: 1000 });
+  const { data: thirdData } = useGetCategoriesByLevelQuery({ level: "third", perPage: 1000 });
 
   const categoryOptions = rootData?.categories || [];
 
@@ -198,6 +198,7 @@ export default function ProductList() {
                   <th className="text-left font-semibold px-4 py-3">PRODUCT</th>
                   <th className="text-left font-semibold px-4 py-3">CATEGORY</th>
                   <th className="text-left font-semibold px-4 py-3">SUB CATEGORY</th>
+                  <th className="text-left font-semibold px-4 py-3">THIRD LEVEL</th>
                   <th className="text-left font-semibold px-4 py-3">PRICE</th>
                   <th className="text-left font-semibold px-4 py-3">SALES</th>
                   <th className="text-left font-semibold px-4 py-3">STOCK</th>
@@ -217,15 +218,22 @@ export default function ProductList() {
                   products.map((p) => (
                     <tr key={p.id} className="align-top hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-gray-900 font-medium">{p.name}</td>
-                      <td className="px-4 py-3 text-gray-600">{p.category?.name || "-"}</td>
-                      <td className="px-4 py-3 text-gray-600">{p.subCategory?.name || "-"}</td>
+                      <td className="px-4 py-3 text-gray-600">
+                        {p.categoryId?.name || p.category?.name || "-"}
+                      </td>
+                      <td className="px-4 py-3 text-gray-600">
+                        {p.subCategoryId?.name || p.subCategory?.name || "-"}
+                      </td>
+                      <td className="px-4 py-3 text-gray-600">
+                        {p.thirdSubCategoryId?.name || p.thirdCategory?.name || "-"}
+                      </td>
                       <td className="px-4 py-3">
                         <div className="text-gray-400 line-through text-xs">
                           {formatINR(p.price)}
                         </div>
                         <div className="text-gray-900 font-medium">{formatINR(p.salePrice)}</div>
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{p.sales} sale</td>
+                      <td className="px-4 py-3 text-gray-600">{p.sales}</td>
                       <td className="px-4 py-3 text-green-600 font-medium">{p.stock}</td>
                       <td className="px-4 py-3 text-blue-600 font-medium">
                         {p.offerPercent ? `${p.offerPercent}%` : "-"}
@@ -235,28 +243,28 @@ export default function ProductList() {
                           className="inline-flex items-center whitespace-nowrap px-2.5 py-1 rounded text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-xs font-medium transition-colors"
                           onClick={() => openOfferModal(p)}
                         >
-                          ADD OFFER
+                          ADD/EDIT OFFER
                         </button>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2 text-gray-500">
                           <button
                             title="Edit"
-                            className="p-1 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                             onClick={() => navigate(`/admin/products/upload?edit=${p.id}`)}
                           >
                             <EditIcon fontSize="small" />
                           </button>
                           <button
                             title="View"
-                            className="p-1 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            className="p-1 text-teal-600 hover:bg-teal-50 rounded transition-colors"
                             onClick={() => navigate(`/admin/products/${p.id}`)}
                           >
                             <VisibilityIcon fontSize="small" />
                           </button>
                           <button
                             title="Delete"
-                            className="p-1 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                             onClick={() => setConfirm({ open: true, id: p.id })}
                           >
                             <DeleteIcon fontSize="small" />
@@ -267,8 +275,28 @@ export default function ProductList() {
                   ))
                 ) : (
                   <tr>
-                    <td className="px-4 py-8 text-center text-gray-500" colSpan={9}>
-                      No products found
+                    <td colSpan={9} className="px-4 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center text-gray-500">
+                        <div className="bg-gray-100 p-4 rounded-full mb-3">
+                          <svg
+                            className="w-8 h-8 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-lg font-medium text-gray-900">No products found</p>
+                        <p className="text-sm">
+                          Try adjusting your search or filter to find what you're looking for.
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 )}

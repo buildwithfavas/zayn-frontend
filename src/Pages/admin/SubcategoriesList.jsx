@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { CircularProgress } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import SearchIcon from "@mui/icons-material/Search";
 import toast from "react-hot-toast";
 import {
   useGetCategoriesByLevelQuery,
@@ -23,8 +24,19 @@ export default function SubcategoriesList() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  // Filter State
+  // Filter & Search State
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+
+  // Debounce search
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1); // Reset to first page on search
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // Fetch categories data
   // Paginate Root Categories
@@ -37,6 +49,7 @@ export default function SubcategoriesList() {
     page: page,
     perPage: perPage,
     filter: filter,
+    search: search,
   });
 
   // Fetch ALL subcategories to ensure we can build the tree for displayed root cats
@@ -371,7 +384,26 @@ export default function SubcategoriesList() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Sub Category List</h1>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center flex-1 justify-end">
+          <div className="relative max-w-xs w-full">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <SearchIcon className="w-4 h-4" />
+            </span>
+            <input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full border border-gray-300 rounded-md pl-9 pr-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="Search categories..."
+            />
+            {searchInput && (
+              <button
+                onClick={() => setSearchInput("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            )}
+          </div>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -407,17 +439,39 @@ export default function SubcategoriesList() {
             </div>
           ) : (
             <>
-              {data.map((cat) => (
-                <CategoryItem
-                  key={cat.id}
-                  cat={cat}
-                  isOpen={openCats[cat.id]}
-                  onToggle={toggleCat}
-                  openSubs={openSubs}
-                  onToggleSub={toggleSub}
-                  onAction={handleAction}
-                />
-              ))}
+              {data.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                  <div className="bg-gray-100 p-4 rounded-full mb-3">
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-lg font-medium text-gray-900">No subcategories found</p>
+                  <p className="text-sm">Try adjusting your search or filter.</p>
+                </div>
+              ) : (
+                data.map((cat) => (
+                  <CategoryItem
+                    key={cat.id}
+                    cat={cat}
+                    isOpen={openCats[cat.id]}
+                    onToggle={toggleCat}
+                    openSubs={openSubs}
+                    onToggleSub={toggleSub}
+                    onAction={handleAction}
+                  />
+                ))
+              )}
 
               {/* Pagination Controls */}
               {totalCategories > 0 && (

@@ -211,13 +211,17 @@ function UsersTable() {
                       <div className="flex items-center gap-3 text-gray-600">
                         <Link
                           to={`/admin/users/${u.id}`}
-                          className="hover:text-gray-900"
+                          className="p-1 text-teal-600 hover:bg-teal-50 rounded transition-colors"
                           title="View"
                         >
                           <Visibility className="w-5 h-5" />
                         </Link>
                         <button
-                          className="hover:text-gray-900"
+                          className={`p-1 rounded transition-colors ${
+                            u.status === "Active"
+                              ? "text-red-600 hover:bg-red-50"
+                              : "text-green-600 hover:bg-green-50"
+                          }`}
                           title={u.status === "Active" ? "Block" : "Unblock"}
                           onClick={() =>
                             setConfirm({

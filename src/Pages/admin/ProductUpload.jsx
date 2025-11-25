@@ -2,25 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-const catData = [
-  {
-    id: 1,
-    name: "Fashion",
-    subs: [
-      { id: 11, name: "Women", subs: [{ id: 111, name: "Tops" }, { id: 112, name: "Jeans" }] },
-      { id: 12, name: "Girls", subs: [{ id: 121, name: "Kurtas & Suits" }, { id: 122, name: "Sarees" }, { id: 123, name: "Tops" }, { id: 124, name: "Kurta Sets" }] },
-      { id: 13, name: "Men", subs: [{ id: 131, name: "Shirts" }, { id: 132, name: "T-Shirts" }] },
-    ],
-  },
-  {
-    id: 2,
-    name: "Electronics",
-    subs: [
-      { id: 21, name: "Mobiles", subs: [{ id: 211, name: "Smartphones" }] },
-      { id: 22, name: "Laptops", subs: [{ id: 221, name: "Gaming Laptops" }, { id: 222, name: "Ultrabooks" }] },
-    ],
-  },
-];
+import { useGetCategoriesByLevelQuery } from "../../store/Api/admin/category";
 
 const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL"];
 
@@ -43,18 +25,22 @@ export default function ProductUpload() {
   const [previews, setPreviews] = useState([]);
   const [dragOver, setDragOver] = useState(false);
 
-  const categoryOptions = useMemo(() => catData.map((c) => ({ id: c.id, name: c.name })), []);
+  // Fetch categories dynamically
+  const { data: rootData } = useGetCategoriesByLevelQuery({ level: "first" });
+  const { data: subData } = useGetCategoriesByLevelQuery({ level: "second" });
+  const { data: thirdData } = useGetCategoriesByLevelQuery({ level: "third" });
+
+  const categoryOptions = useMemo(() => rootData?.categories || [], [rootData]);
+
   const subOptions = useMemo(() => {
-    if (!catId) return [];
-    const cat = catData.find((c) => c.id === Number(catId));
-    return cat ? cat.subs : [];
-  }, [catId]);
+    if (!catId || !subData?.categories) return [];
+    return subData.categories.filter((s) => s.parentId === catId);
+  }, [catId, subData]);
+
   const subsubOptions = useMemo(() => {
-    if (!catId || !subId) return [];
-    const cat = catData.find((c) => c.id === Number(catId));
-    const sub = cat?.subs.find((s) => s.id === Number(subId));
-    return sub ? sub.subs : [];
-  }, [catId, subId]);
+    if (!subId || !thirdData?.categories) return [];
+    return thirdData.categories.filter((ss) => ss.parentId === subId);
+  }, [subId, thirdData]);
 
   useEffect(() => {
     const urls = files.map((f) => URL.createObjectURL(f));
@@ -122,14 +108,16 @@ export default function ProductUpload() {
               >
                 <option value="">Select</option>
                 {categoryOptions.map((c) => (
-                  <option key={c.id} value={c.id}>
+                  <option key={c._id} value={c._id}>
                     {c.name}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Product Sub Category</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Product Sub Category
+              </label>
               <select
                 value={subId}
                 onChange={(e) => {
@@ -141,14 +129,16 @@ export default function ProductUpload() {
               >
                 <option value="">Select</option>
                 {subOptions.map((s) => (
-                  <option key={s.id} value={s.id}>
+                  <option key={s._id} value={s._id}>
                     {s.name}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Product Third Level Category</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Product Third Level Category
+              </label>
               <select
                 value={subsubId}
                 onChange={(e) => setSubsubId(e.target.value)}
@@ -157,7 +147,7 @@ export default function ProductUpload() {
               >
                 <option value="">Select</option>
                 {subsubOptions.map((ss) => (
-                  <option key={ss.id} value={ss.id}>
+                  <option key={ss._id} value={ss._id}>
                     {ss.name}
                   </option>
                 ))}
@@ -256,19 +246,30 @@ export default function ProductUpload() {
         </div>
 
         <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-          <div className="text-sm font-semibold text-gray-800 mb-3">Media & Images</div>
+          <div className="text-sm font-semibold text-gray-800">Images</div>
+          <p className="text-xs text-gray-500 mt-1 mb-3">
+            Images should be cropped and resized properly before upload.
+          </p>
           {previews.length > 0 && (
             <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
               {previews.map((src, idx) => (
                 <div key={idx} className="relative group">
-                  <img src={src} alt="preview" className="w-full h-32 object-cover rounded border border-gray-200" />
+                  <img
+                    src={src}
+                    alt="preview"
+                    className="w-full h-32 object-cover rounded border border-gray-200"
+                  />
                   <button
                     type="button"
                     onClick={() => removeImage(idx)}
                     className="absolute top-1 right-1 p-1 rounded bg-black/60 text-white opacity-0 group-hover:opacity-100"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 8.586l4.95-4.95 1.414 1.415L11.414 10l4.95 4.95-1.414 1.414L10 11.414l-4.95 4.95-1.414-1.414L8.586 10 3.636 5.05l1.414-1.414L10 8.586z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M10 8.586l4.95-4.95 1.414 1.415L11.414 10l4.95 4.95-1.414 1.414L10 11.414l-4.95 4.95-1.414-1.414L8.586 10 3.636 5.05l1.414-1.414L10 8.586z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -286,11 +287,18 @@ export default function ProductUpload() {
               setDragOver(false);
               onFileInput(e.dataTransfer.files);
             }}
-            className={`relative border-2 border-dashed rounded-md p-6 text-center ${dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"}`}
+            className={`relative border-2 border-dashed rounded-md p-6 text-center ${
+              dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
+            }`}
           >
             <div className="flex flex-col items-center text-gray-500">
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6H16a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6H16a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
               </svg>
               <div className="mt-2 text-sm">
                 <span className="text-gray-700">Click to upload</span> or drag and drop
@@ -314,7 +322,12 @@ export default function ProductUpload() {
             className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md text-white bg-blue-600 hover:bg-blue-700"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             ADD PRODUCT
           </button>

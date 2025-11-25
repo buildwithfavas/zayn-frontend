@@ -28,7 +28,9 @@ const BlockConfirmModal = ({ open, isBlocked, onConfirm, onCancel }) => {
             Cancel
           </button>
           <button
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded text-white bg-red-600 hover:bg-red-700"
+            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded text-white ${
+              isBlocked ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
+            }`}
             onClick={onConfirm}
           >
             {isBlocked ? "Unblock" : "Block"}
