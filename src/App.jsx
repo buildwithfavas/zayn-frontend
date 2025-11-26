@@ -18,7 +18,7 @@ import CategoriesList from "./pages/admin/CategoriesList";
 import CategoryCreate from "./pages/admin/CategoryCreate";
 import SubcategoriesList from "./pages/admin/SubcategoriesList";
 import ProductList from "./pages/admin/ProductList";
-import ProductUpload from "./pages/admin/ProductUpload";
+import AddProduct from "./pages/admin/AddProduct";
 import ProductSizeCreate from "./pages/admin/ProductSizeCreate";
 import AdminProductDetails from "./pages/admin/AdminProductDetails";
 import PlaceholderPage from "./pages/admin/PlaceholderPage";
@@ -70,7 +70,7 @@ function App() {
         <Route path="subcategories" element={<SubcategoriesList />} />
         <Route path="products" element={<ProductList />} />
         <Route path="products/:id" element={<AdminProductDetails />} />
-        <Route path="products/upload" element={<ProductUpload />} />
+        <Route path="products/upload" element={<AddProduct />} />
         <Route path="product-sizes/new" element={<ProductSizeCreate />} />
 
         {/* Placeholder Routes */}
