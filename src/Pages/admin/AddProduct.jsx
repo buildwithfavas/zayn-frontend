@@ -204,9 +204,7 @@ export default function AddProduct() {
   return (
     <div className="space-y-8 pb-10">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          Add Product {hasVariant ? "(Multi-Variant)" : "(Simple)"}
-        </h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add Product</h1>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-8">
